@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'finances.Utilisateur'
+LOGIN_URL = '/connexion/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
