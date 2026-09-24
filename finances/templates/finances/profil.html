@@ -1,0 +1,542 @@
+{% extends "finances/base.html" %}
+{% load static %}
+
+{% block title %}Frana — Mon profil{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =====================================================
+       VARIABLES FRANA
+    ===================================================== */
+    :root {
+        color-scheme: dark;
+
+        --body-font: "Poppins", "Times New Roman", serif;
+
+        --brown-deep: #1e140d;
+        --brown-dark: #302016;
+        --brown: #5b3c22;
+        --brown-light: #8b6235;
+        --gold: #d9ad55;
+        --gold-light: #f0ce82;
+        --cream: #f1e7d7;
+        --cream-light: #fffaf2;
+
+        --text-main: #fffaf2;
+        --text-muted: #d8cbbb;
+
+        --card-bg: rgba(30, 20, 13, 0.72);
+        --card-border: rgba(217, 173, 85, 0.28);
+    }
+
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    /* =====================================================
+       RESET
+    ===================================================== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: var(--body-font);
+    }
+
+    body {
+        min-height: 100vh;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(20, 13, 8, 0.55) 0%,
+                rgba(20, 13, 8, 0.72) 45%,
+                rgba(20, 13, 8, 0.92) 100%
+            ),
+            url("{% static 'finances/img/pexels-pavel-danilyuk-7654180.jpg' %}")
+            center / cover no-repeat fixed;
+        background-attachment: fixed;
+        color: var(--text-main);
+    }
+
+    a { text-decoration: none; }
+
+    /* =====================================================
+       CONTAINER
+    ===================================================== */
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 130px 30px 60px;
+    }
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+    .page-header {
+        margin-bottom: 34px;
+    }
+
+    .page-header__small {
+        display: inline-block;
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        margin-bottom: 12px;
+    }
+
+    .page-header h1 {
+        font-size: clamp(28px, 3vw, 42px);
+        font-weight: 700;
+        color: var(--cream-light);
+        margin-bottom: 10px;
+        line-height: 1.15;
+    }
+
+    .page-header h1 span {
+        color: var(--gold);
+    }
+
+    .page-header p {
+        color: var(--text-muted);
+        font-size: 15px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* =====================================================
+       PROFIL CARD
+    ===================================================== */
+    .profil-card {
+        background: linear-gradient(
+            145deg,
+            rgba(48, 32, 22, 0.82),
+            rgba(25, 17, 11, 0.78)
+        );
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 30px;
+        margin-bottom: 28px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 26px;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profil-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 12%;
+        width: 76%;
+        height: 1.5px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            var(--gold),
+            var(--gold-light),
+            transparent
+        );
+        border-radius: 10px;
+    }
+
+    .profil-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--brown-light), var(--gold));
+        color: #24170d;
+        font-size: 38px;
+        font-weight: 700;
+        box-shadow: 0 10px 30px rgba(191, 140, 55, 0.35);
+        flex-shrink: 0;
+    }
+
+    .profil-info h2 {
+        color: var(--cream-light);
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .profil-info .phone {
+        color: var(--gold);
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-family: Arial, sans-serif;
+    }
+
+    .profil-info .email {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    .profil-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: Arial, sans-serif;
+        letter-spacing: 0.4px;
+    }
+
+    .badge--gold {
+        background: rgba(217, 173, 85, 0.15);
+        color: var(--gold-light);
+        border: 1px solid rgba(217, 173, 85, 0.4);
+    }
+
+    .badge--success {
+        background: rgba(80, 180, 100, 0.15);
+        color: #9bffb2;
+        border: 1px solid rgba(100, 220, 120, 0.4);
+    }
+
+    .badge--muted {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-muted);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* =====================================================
+       STATS RAPIDES
+    ===================================================== */
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .stat {
+        background: linear-gradient(
+            145deg,
+            rgba(48, 32, 22, 0.82),
+            rgba(25, 17, 11, 0.78)
+        );
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 20px 22px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stat:hover {
+        transform: translateY(-3px);
+        box-shadow:
+            0 25px 55px -20px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(217, 173, 85, 0.25);
+    }
+
+    .stat__label {
+        color: var(--text-muted);
+        font-size: 12px;
+        letter-spacing: 1.2px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        font-family: Arial, sans-serif;
+    }
+
+    .stat__value {
+        color: var(--gold);
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .stat__hint {
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-top: 4px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* =====================================================
+       SECTION
+    ===================================================== */
+    .section {
+        background: linear-gradient(
+            145deg,
+            rgba(48, 32, 22, 0.82),
+            rgba(25, 17, 11, 0.78)
+        );
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 26px 30px;
+        margin-bottom: 24px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .section__title {
+        color: var(--cream-light);
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(217, 173, 85, 0.15);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .info-item__label {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-family: Arial, sans-serif;
+    }
+
+    .info-item__value {
+        color: var(--cream-light);
+        font-size: 15px;
+        font-weight: 500;
+        font-family: Arial, sans-serif;
+    }
+
+    .info-item__value--gold {
+        color: var(--gold);
+        font-weight: 700;
+    }
+
+    /* =====================================================
+       BOUTONS
+    ===================================================== */
+    .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 46px;
+        padding: 0 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn--primary {
+        color: #24170d;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        box-shadow: 0 6px 20px rgba(191, 140, 55, 0.35);
+    }
+
+    .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(191, 140, 55, 0.55);
+        filter: brightness(1.06);
+    }
+
+    .btn--ghost {
+        color: var(--gold-light);
+        background: rgba(217, 173, 85, 0.08);
+        border: 1px solid rgba(217, 173, 85, 0.55);
+    }
+
+    .btn--ghost:hover {
+        background: rgba(217, 173, 85, 0.18);
+        transform: translateY(-2px);
+    }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 750px) {
+        .container { padding: 90px 20px 100px; }
+
+        .profil-card {
+            grid-template-columns: 1fr;
+            text-align: center;
+            justify-items: center;
+        }
+        .profil-meta { justify-content: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <span class="page-header__small">MON PROFIL</span>
+            <h1>Vos informations, <span>votre espace.</span></h1>
+            <p>Consultez et gérez les paramètres de votre compte Frana.</p>
+        </div>
+
+        <!-- CARTE PROFIL -->
+        <div class="profil-card">
+            <div class="profil-avatar">
+                {{ utilisateur.nom_complet|slice:":1"|upper }}
+            </div>
+            <div class="profil-info">
+                <h2>{{ utilisateur.nom_complet }}</h2>
+                <p class="phone">📞 {{ utilisateur.telephone }}</p>
+                {% if utilisateur.email %}
+                    <p class="email">✉ {{ utilisateur.email }}</p>
+                {% else %}
+                    <p class="email">Aucun email renseigné</p>
+                {% endif %}
+
+                <div class="profil-meta">
+                    <span class="badge badge--gold">{{ utilisateur.get_frequence_revenu_display }}</span>
+                    <span class="badge badge--gold">{{ utilisateur.devise }}</span>
+                    {% if utilisateur.statut_abonnement == "essai" %}
+                        <span class="badge badge--success">Essai en cours</span>
+                    {% elif utilisateur.statut_abonnement == "payant" %}
+                        <span class="badge badge--success">Abonné payant</span>
+                    {% else %}
+                        <span class="badge badge--muted">Compte gratuit</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS RAPIDES -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat__label">Solde</div>
+                <div class="stat__value">{{ solde|floatformat:0 }} {{ utilisateur.devise }}</div>
+                <div class="stat__hint">Disponible actuellement</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat__label">Transactions</div>
+                <div class="stat__value">{{ nb_transactions }}</div>
+                <div class="stat__hint">Enregistrées au total</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat__label">Objectifs</div>
+                <div class="stat__value">{{ nb_objectifs }}</div>
+                <div class="stat__hint">Créés depuis le début</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat__label">Dettes en cours</div>
+                <div class="stat__value">{{ nb_dettes }}</div>
+                <div class="stat__hint">Actuellement actives</div>
+            </div>
+        </div>
+
+        <!-- INFORMATIONS -->
+        <div class="section">
+            <h2 class="section__title">Informations du compte</h2>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-item__label">Nom complet</span>
+                    <span class="info-item__value">{{ utilisateur.nom_complet }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-item__label">Téléphone</span>
+                    <span class="info-item__value">{{ utilisateur.telephone }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-item__label">Email</span>
+                    <span class="info-item__value">
+                        {% if utilisateur.email %}{{ utilisateur.email }}{% else %}—{% endif %}
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-item__label">Fréquence de revenu</span>
+                    <span class="info-item__value info-item__value--gold">
+                        {{ utilisateur.get_frequence_revenu_display }}
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-item__label">Jour de paie habituel</span>
+                    <span class="info-item__value info-item__value--gold">
+                        Le {{ utilisateur.date_paie_habituelle }} du mois
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-item__label">Devise</span>
+                    <span class="info-item__value info-item__value--gold">
+                        {{ utilisateur.devise }}
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-item__label">Statut d'abonnement</span>
+                    <span class="info-item__value">
+                        {{ utilisateur.get_statut_abonnement_display }}
+                    </span>
+                </div>
+
+                {% if utilisateur.date_fin_essai %}
+                    <div class="info-item">
+                        <span class="info-item__label">Fin de l'essai</span>
+                        <span class="info-item__value info-item__value--gold">
+                            {{ utilisateur.date_fin_essai|date:"d F Y" }}
+                        </span>
+                    </div>
+                {% endif %}
+
+                <div class="info-item">
+                    <span class="info-item__label">Inscrit depuis</span>
+                    <span class="info-item__value">
+                        {{ utilisateur.cree_le|date:"d F Y" }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="cta-row">
+                <a href="{% url 'dashboard' %}" class="btn btn--primary">Retour au tableau de bord</a>
+                <a href="{% url 'categories' %}" class="btn btn--ghost">Gérer mes catégories</a>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% comment %}
+Carte de feedback — à inclure dans une page où l'utilisateur vient d'utiliser
+une fonctionnalité précise.
+
+Usage dans dashboard.html (feedback sur le compte à rebours) :
+
+    {% include "finances/_feedback_carte.html" %}
+
+Usage sur une autre page, avec une fonctionnalité différente :
+
+    {% include "finances/_feedback_carte.html" with feedback_fonctionnalite="epargne" %}
+
+Valeurs possibles : general, transactions, compte_a_rebours, epargne, dettes
+(voir feedback.models.FeedbackQuestion.Fonctionnalite).
+{% endcomment %}
+<div id="feedback-carte"
+     class="feedback-carte"
+     data-fonctionnalite="{{ feedback_fonctionnalite|default:'compte_a_rebours' }}"
+     style="display:none;"></div>

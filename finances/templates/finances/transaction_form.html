@@ -1,0 +1,469 @@
+{% extends "finances/base.html" %}
+{% load static %}
+
+{% block title %}Frana — {{ titre|default:"Nouvelle transaction" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =====================================================
+       VARIABLES FRANA
+    ===================================================== */
+    :root {
+        color-scheme: dark;
+
+        --body-font: "Poppins", "Times New Roman", serif;
+
+        --brown-deep: #1e140d;
+        --brown-dark: #302016;
+        --brown: #5b3c22;
+        --brown-light: #8b6235;
+        --gold: #d9ad55;
+        --gold-light: #f0ce82;
+        --cream: #f1e7d7;
+        --cream-light: #fffaf2;
+
+        --text-main: #fffaf2;
+        --text-muted: #d8cbbb;
+
+        --card-bg: rgba(30, 20, 13, 0.72);
+        --card-border: rgba(217, 173, 85, 0.28);
+    }
+
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    /* =====================================================
+       RESET
+    ===================================================== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: var(--body-font);
+    }
+
+    body {
+        min-height: 100vh;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(20, 13, 8, 0.55) 0%,
+                rgba(20, 13, 8, 0.72) 45%,
+                rgba(20, 13, 8, 0.92) 100%
+            ),
+            url("{% static 'finances/img/pexels-pavel-danilyuk-7654180.jpg' %}")
+            center / cover no-repeat fixed;
+        background-attachment: fixed;
+        color: var(--text-main);
+    }
+
+    a { text-decoration: none; }
+    button { cursor: pointer; border: none; outline: none; }
+
+    /* =====================================================
+       CONTAINER
+    ===================================================== */
+    .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 130px 30px 60px;
+    }
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+    .page-header {
+        margin-bottom: 28px;
+    }
+
+    .page-header__small {
+        display: inline-block;
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        margin-bottom: 10px;
+    }
+
+    .page-header h1 {
+        font-size: clamp(26px, 3vw, 36px);
+        font-weight: 700;
+        color: var(--cream-light);
+        margin-bottom: 8px;
+        line-height: 1.15;
+    }
+
+    .page-header h1 span { color: var(--gold); }
+
+    .page-header p {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* =====================================================
+       FORM CARD
+    ===================================================== */
+    .form-card {
+        background: linear-gradient(
+            145deg,
+            rgba(48, 32, 22, 0.82),
+            rgba(25, 17, 11, 0.78)
+        );
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 34px 32px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 12%;
+        width: 76%;
+        height: 2px;
+        border-radius: 10px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            var(--gold),
+            var(--gold-light),
+            transparent
+        );
+    }
+
+    /* =====================================================
+       ALERTES
+    ===================================================== */
+    .alert {
+        padding: 14px 18px;
+        border-radius: 10px;
+        margin-bottom: 22px;
+        font-size: 13px;
+        line-height: 1.5;
+        font-family: Arial, sans-serif;
+    }
+
+    .alert--error {
+        background: rgba(191, 60, 60, 0.15);
+        border: 1px solid rgba(230, 100, 100, 0.4);
+        color: #ffd4d4;
+    }
+
+    .alert--success {
+        background: rgba(80, 180, 100, 0.15);
+        border: 1px solid rgba(100, 220, 120, 0.4);
+        color: #d4ffdd;
+    }
+
+    /* =====================================================
+       CHAMPS
+    ===================================================== */
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--gold);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Champs Django générés */
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="email"],
+    .form-group input[type="date"],
+    .form-group input[type="password"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(217, 173, 85, 0.25);
+        color: var(--cream-light);
+        font-family: var(--body-font);
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+
+    .form-group input[type="date"] {
+        /* Restaurer la flèche calendrier */
+        appearance: auto;
+        -webkit-appearance: auto;
+    }
+
+    .form-group select {
+        background-image:
+            linear-gradient(45deg, transparent 50%, var(--gold) 50%),
+            linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+        background-position:
+            calc(100% - 20px) calc(50% + 2px),
+            calc(100% - 15px) calc(50% + 2px);
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+        padding-right: 40px;
+        cursor: pointer;
+    }
+
+    .form-group select option {
+        background: #2a1b10;
+        color: var(--cream-light);
+        padding: 10px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: var(--gold);
+        background: rgba(217, 173, 85, 0.06) !important;
+        box-shadow: 0 0 0 3px rgba(217, 173, 85, 0.12);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: rgba(216, 203, 187, 0.55);
+    }
+
+    /* Autofill */
+    .form-group input:-webkit-autofill,
+    .form-group input:-webkit-autofill:hover,
+    .form-group input:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--cream-light);
+        -webkit-box-shadow: 0 0 0 1000px rgba(30, 20, 13, 0.95) inset;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Help text et erreurs */
+    .form-group .helptext {
+        display: block;
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-top: 6px;
+        font-family: Arial, sans-serif;
+        line-height: 1.4;
+    }
+
+    .form-group .errorlist {
+        list-style: none;
+        margin-top: 8px;
+    }
+
+    .form-group .errorlist li {
+        color: #ffb3b3;
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Deux colonnes sur desktop */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 600px) {
+        .form-row { grid-template-columns: 1fr; }
+    }
+
+    /* =====================================================
+       BOUTONS
+    ===================================================== */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 48px;
+        padding: 0 28px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+        border: none;
+        flex: 1;
+        min-width: 160px;
+    }
+
+    .btn--primary {
+        color: #24170d;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        box-shadow: 0 6px 20px rgba(191, 140, 55, 0.35);
+    }
+
+    .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(191, 140, 55, 0.55);
+        filter: brightness(1.06);
+    }
+
+    .btn--ghost {
+        color: var(--gold-light);
+        background: rgba(217, 173, 85, 0.08);
+        border: 1px solid rgba(217, 173, 85, 0.55);
+    }
+
+    .btn--ghost:hover {
+        background: rgba(217, 173, 85, 0.18);
+        transform: translateY(-2px);
+    }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 750px) {
+        .container { padding: 90px 20px 100px; }
+
+        .form-card { padding: 26px 22px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <span class="page-header__small">NOUVELLE ENTRÉE</span>
+            <h1>{{ titre|default:"Nouvelle" }} <span>transaction.</span></h1>
+            <p>Enregistrez une entrée ou une sortie d'argent pour suivre votre solde.</p>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="form-card">
+
+            <!-- Erreurs non liées à un champ -->
+            {% if form.non_field_errors %}
+                <div class="alert alert--error">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- Type + Montant -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.type.id_for_label }}">Type</label>
+                        {{ form.type }}
+                        {% if form.type.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.type.errors %}<li>{{ error }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.montant.id_for_label }}">Montant</label>
+                        {{ form.montant }}
+                        {% if form.montant.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.montant.errors %}<li>{{ error }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Catégorie -->
+                <div class="form-group">
+                    <label for="{{ form.categorie.id_for_label }}">Catégorie</label>
+                    {{ form.categorie }}
+                    {% if form.categorie.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.categorie.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Date + Canal -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.date.id_for_label }}">Date</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.date.errors %}<li>{{ error }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.canal_declaratif.id_for_label }}">Canal</label>
+                        {{ form.canal_declaratif }}
+                        {% if form.canal_declaratif.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.canal_declaratif.errors %}<li>{{ error }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Source de revenu (optionnel) -->
+                <div class="form-group">
+                    <label for="{{ form.source_revenu.id_for_label }}">
+                        Source de revenu
+                        <span style="text-transform:none; letter-spacing:0; color:var(--text-muted); font-weight:400;">
+                            (optionnel — pour les revenus)
+                        </span>
+                    </label>
+                    {{ form.source_revenu }}
+                    {% if form.source_revenu.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.source_revenu.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Note -->
+                <div class="form-group">
+                    <label for="{{ form.note.id_for_label }}">
+                        Note
+                        <span style="text-transform:none; letter-spacing:0; color:var(--text-muted); font-weight:400;">
+                            (optionnel)
+                        </span>
+                    </label>
+                    {{ form.note }}
+                    {% if form.note.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.note.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <a href="{% url 'transactions' %}" class="btn btn--ghost">Annuler</a>
+                    <button type="submit" class="btn btn--primary">Enregistrer la transaction</button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+{% endblock %}

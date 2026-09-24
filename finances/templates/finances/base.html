@@ -1,0 +1,348 @@
+{% load static %}
+{% load pwa %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'finances/img/favicon/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'finances/img/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'finances/img/favicon/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'finances/img/favicon/apple-touch-icon.png' %}">
+    <title>{% block title %}Frana{% endblock %}</title>
+    {% progressive_web_app_meta %}
+    <script src="{% static 'finances/js/pwa-install.js' %}" defer></script>
+
+    <!-- App feedback produit -->
+    <link rel="stylesheet" href="{% static 'feedback/feedback.css' %}">
+    <script src="{% static 'feedback/feedback.js' %}" defer></script>
+
+    <style>
+        /* =====================================================
+           NAVBAR TOP + BOTTOM NAV — Style uniquement
+        ===================================================== */
+
+        /* NAVBAR TOP */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 78px;
+            padding: 0 55px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(30, 20, 13, 0.72);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(220, 180, 100, 0.25);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.30);
+            z-index: 1000;
+        }
+
+        .navbar .logo { display: flex; align-items: center; }
+
+        .navbar .logo img {
+            width: 135px;
+            height: 62px;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 9px;
+            padding: 4px 9px;
+            transition: 0.3s;
+        }
+
+        .navbar .logo:hover img { transform: scale(1.04); }
+
+        .navbar .menu {
+            position: relative;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar .menu li { position: relative; z-index: 1; }
+
+        .navbar .menu li a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            padding: 0 22px;
+            color: #f1e7d7;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .navbar .menu li:hover a { color: #ffffff; }
+        .navbar .menu li.active a { color: #f0ce82; }
+
+        .navbar .menu li.active a::after {
+            content: "";
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, #d9ad55, #f0ce82);
+            border-radius: 4px;
+        }
+
+        .navbar__logout {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            padding: 0 24px;
+            border-radius: 8px;
+            color: #f0ce82;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: rgba(217, 173, 85, 0.08);
+            border: 1px solid rgba(217, 173, 85, 0.55);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+        }
+
+        .navbar__logout:hover {
+            transform: translateY(-2px);
+            background: rgba(217, 173, 85, 0.18);
+            box-shadow: 0 10px 28px rgba(191, 140, 55, 0.45);
+        }
+
+        /* =====================================================
+           CORRECTION #2 — Conteneur d'actions navbar
+        ===================================================== */
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* BOTTOM NAV (mobile) — cachée par défaut */
+        .bottom-nav { display: none; }
+
+        /* TABLETTE */
+        @media (max-width: 900px) {
+            .navbar { padding: 0 25px; }
+            .navbar .menu li a {
+                padding: 0 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* MOBILE */
+        @media (max-width: 750px) {
+
+            .navbar {
+                height: 62px;
+                padding: 0 20px;
+            }
+
+            .navbar .logo img {
+                width: 100px;
+                height: 44px;
+            }
+
+            .navbar .menu { display: none; }
+
+            /* BOTTOM NAV */
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 68px;
+                z-index: 1000;
+
+                display: flex;
+                align-items: stretch;
+                justify-content: space-around;
+
+                background: rgba(30, 20, 13, 0.96);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+
+                border-top: 1px solid rgba(217, 173, 85, 0.30);
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.45);
+
+                padding-bottom: env(safe-area-inset-bottom, 0);
+            }
+
+            .bottom-nav__item {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+
+                color: #d8cbbb;
+                font-size: 10px;
+                font-weight: 600;
+                font-family: Arial, sans-serif;
+                letter-spacing: 0.2px;
+                text-decoration: none;
+
+                position: relative;
+                transition: color 0.3s, transform 0.2s;
+            }
+
+            .bottom-nav__item svg {
+                width: 22px;
+                height: 22px;
+                transition: transform 0.25s, color 0.3s;
+            }
+
+            .bottom-nav__item.active { color: #f0ce82; }
+
+            .bottom-nav__item.active svg {
+                color: #d9ad55;
+                transform: translateY(-2px);
+            }
+
+            .bottom-nav__item.active::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 32px;
+                height: 2px;
+                border-radius: 0 0 4px 4px;
+                background: linear-gradient(90deg, #d9ad55, #f0ce82);
+            }
+
+            .bottom-nav__item:active { transform: scale(0.94); }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- =====================================================
+         NAVBAR TOP
+    ===================================================== -->
+    <nav class="navbar">
+        <a href="{% url 'dashboard' %}" class="logo">
+            <img src="{% static 'finances/img/logo.png' %}" alt="FRANA">
+        </a>
+
+        <ul class="menu">
+            <li class="{% if page_active == 'dashboard' %}active{% endif %}">
+                <a href="{% url 'dashboard' %}">Tableau de bord</a>
+            </li>
+            <li class="{% if page_active == 'transactions' %}active{% endif %}">
+                <a href="{% url 'transactions' %}">Transactions</a>
+            </li>
+            <li class="{% if page_active == 'sources' %}active{% endif %}">
+                <a href="{% url 'sources' %}">Revenus</a>
+            </li>
+            <li class="{% if page_active == 'objectifs' %}active{% endif %}">
+                <a href="{% url 'objectifs' %}">Objectifs</a>
+            </li>
+            <li class="{% if page_active == 'dettes' %}active{% endif %}">
+                <a href="{% url 'dettes' %}">Dettes</a>
+            </li>
+            <li class="{% if page_active == 'profil' %}active{% endif %}">
+                <a href="{% url 'profil' %}">Profil</a>
+            </li>
+        </ul>
+
+        <!-- =====================================================
+             CORRECTION #2 — Actions navbar regroupées
+        ===================================================== -->
+        <div class="navbar__actions">
+
+            <form method="post" action="{% url 'deconnexion' %}" style="margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="navbar__logout">Déconnexion</button>
+            </form>
+
+        </div>
+    </nav>
+
+    <!-- =====================================================
+         CONTENU DE LA PAGE
+    ===================================================== -->
+    {% block content %}{% endblock %}
+
+    <!-- =====================================================
+         BOTTOM NAVBAR — Mobile uniquement
+    ===================================================== -->
+    <nav class="bottom-nav">
+
+        <a href="{% url 'dashboard' %}"
+           class="bottom-nav__item {% if page_active == 'dashboard' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 10 12 3l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <path d="M9 21v-8h6v8"/>
+            </svg>
+            Accueil
+        </a>
+
+        <a href="{% url 'transactions' %}"
+           class="bottom-nav__item {% if page_active == 'transactions' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"/>
+                <path d="M7 14l4-4 4 4 5-5"/>
+            </svg>
+            Trans.
+        </a>
+
+        <a href="{% url 'sources' %}"
+           class="bottom-nav__item {% if page_active == 'sources' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            Revenus
+        </a>
+
+        <a href="{% url 'objectifs' %}"
+           class="bottom-nav__item {% if page_active == 'objectifs' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+            </svg>
+            Objectifs
+        </a>
+
+        <a href="{% url 'dettes' %}"
+           class="bottom-nav__item {% if page_active == 'dettes' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17l9.2-9.2M17 17V7H7"/>
+            </svg>
+            Dettes
+        </a>
+
+        <a href="{% url 'profil' %}"
+           class="bottom-nav__item {% if page_active == 'profil' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Profil
+        </a>
+
+    </nav>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

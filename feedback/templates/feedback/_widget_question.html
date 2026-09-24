@@ -1,0 +1,24 @@
+<div class="feedback-widget" data-question-id="{{ question.id }}">
+  <p class="feedback-question">💬 {{ question.question }}</p>
+
+  {% if question.type_reponse == "satisfaction" %}
+    <div class="feedback-choix">
+      <button type="button" class="feedback-btn" data-reponse="oui">👍 Oui</button>
+      <button type="button" class="feedback-btn" data-reponse="un_peu">😐 Un peu</button>
+      <button type="button" class="feedback-btn" data-reponse="non">👎 Non</button>
+    </div>
+
+  {% elif question.type_reponse == "choix" %}
+    <div class="feedback-choix">
+      {% for option in question.options_choix %}
+        <button type="button" class="feedback-btn" data-reponse="{{ option }}">{{ option }}</button>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <form class="feedback-form-texte">
+      <textarea name="commentaire" placeholder="Dites-nous en plus" rows="3"></textarea>
+      <button type="submit" class="feedback-btn">Envoyer</button>
+    </form>
+  {% endif %}
+</div>

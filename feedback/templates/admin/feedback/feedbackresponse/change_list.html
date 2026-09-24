@@ -1,0 +1,20 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+  <div style="margin-bottom: 20px; padding: 15px; background: #f8f8f8; border-radius: 6px;">
+    <h2>Répartition par fonctionnalité</h2>
+    {% for fonctionnalite, data in repartition_par_fonctionnalite.items %}
+      <div style="margin-bottom: 12px;">
+        <strong>{{ fonctionnalite }}</strong> — {{ data.total }} réponse{{ data.total|pluralize }}
+        <ul>
+          {% for r in data.reponses %}
+            <li>{{ r.reponse }} : {{ r.pourcentage }} % ({{ r.nb }})</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% empty %}
+      <p>Aucune réponse pour le moment.</p>
+    {% endfor %}
+  </div>
+  {{ block.super }}
+{% endblock %}

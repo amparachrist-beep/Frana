@@ -1,0 +1,590 @@
+{% extends "finances/base.html" %}
+{% load static %}
+
+{% block title %}Frana — Tableau de bord{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =====================================================
+       VARIABLES FRANA
+    ===================================================== */
+    :root {
+        color-scheme: dark;
+        --body-font: "Poppins", "Times New Roman", serif;
+        --brown-deep: #1e140d;
+        --brown-dark: #302016;
+        --brown: #5b3c22;
+        --brown-light: #8b6235;
+        --gold: #d9ad55;
+        --gold-light: #f0ce82;
+        --cream: #f1e7d7;
+        --cream-light: #fffaf2;
+        --text-main: #fffaf2;
+        --text-muted: #d8cbbb;
+        --card-bg: rgba(30, 20, 13, 0.72);
+        --card-border: rgba(217, 173, 85, 0.28);
+    }
+
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    /* =====================================================
+       RESET + BODY
+    ===================================================== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: var(--body-font);
+    }
+
+    body {
+        min-height: 100vh;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(20, 13, 8, 0.55) 0%,
+                rgba(20, 13, 8, 0.72) 45%,
+                rgba(20, 13, 8, 0.92) 100%
+            ),
+            url("{% static 'finances/img/pexels-pavel-danilyuk-7654180.jpg' %}")
+            center / cover no-repeat fixed;
+        background-attachment: fixed;
+        color: var(--text-main);
+    }
+
+    a { text-decoration: none; }
+
+    /* =====================================================
+       CONTAINER
+    ===================================================== */
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 130px 30px 60px;
+    }
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+    .page-header { margin-bottom: 34px; }
+
+    .page-header__small {
+        display: inline-block;
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        margin-bottom: 12px;
+    }
+
+    .page-header h1 {
+        font-size: clamp(28px, 3vw, 42px);
+        font-weight: 700;
+        color: var(--cream-light);
+        margin-bottom: 10px;
+        line-height: 1.15;
+    }
+
+    .page-header h1 span { color: var(--gold); }
+
+    .page-header p {
+        color: var(--text-muted);
+        font-size: 15px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* =====================================================
+       ALERTES
+    ===================================================== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 10px;
+        margin-bottom: 22px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    .alert--success {
+        background: rgba(80, 180, 100, 0.15);
+        border: 1px solid rgba(100, 220, 120, 0.4);
+        color: #d4ffdd;
+    }
+
+    .alert--error {
+        background: rgba(191, 60, 60, 0.15);
+        border: 1px solid rgba(230, 100, 100, 0.4);
+        color: #ffd4d4;
+    }
+
+    /* =====================================================
+       CARTES STATS
+    ===================================================== */
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .stat {
+        background: linear-gradient(145deg, rgba(48, 32, 22, 0.82), rgba(25, 17, 11, 0.78));
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 22px 24px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stat::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 12%;
+        width: 76%;
+        height: 1.5px;
+        background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), transparent);
+        border-radius: 10px;
+    }
+
+    .stat:hover {
+        transform: translateY(-4px);
+        box-shadow:
+            0 25px 55px -20px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(217, 173, 85, 0.25);
+    }
+
+    .stat__label {
+        color: var(--text-muted);
+        font-size: 13px;
+        letter-spacing: 1px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        font-family: Arial, sans-serif;
+    }
+
+    .stat__value {
+        color: var(--cream-light);
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    .stat__value--gold { color: var(--gold); }
+    .stat__value--positive { color: #7be495; }
+    .stat__value--negative { color: #ff8c8c; }
+
+    .stat__hint {
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-top: 8px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* =====================================================
+       COMPTE À REBOURS
+    ===================================================== */
+    .countdown {
+        background: linear-gradient(135deg, rgba(139, 98, 53, 0.35), rgba(48, 32, 22, 0.85));
+        border: 1px solid rgba(217, 173, 85, 0.4);
+        border-radius: 18px;
+        padding: 26px 30px;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .countdown::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--gold), var(--gold-light));
+    }
+
+    .countdown__left { display: flex; flex-direction: column; gap: 6px; }
+
+    .countdown__label {
+        color: var(--text-muted);
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-family: Arial, sans-serif;
+    }
+
+    .countdown__days {
+        color: var(--gold);
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .countdown__days span {
+        font-size: 16px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-left: 6px;
+    }
+
+    .countdown__right { text-align: right; font-family: Arial, sans-serif; }
+    .countdown__right p { color: var(--cream); font-size: 14px; margin-bottom: 4px; }
+    .countdown__right strong { color: var(--gold-light); font-size: 16px; }
+
+    /* =====================================================
+       GRILLE
+    ===================================================== */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    @media (max-width: 900px) {
+        .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* =====================================================
+       PANELS
+    ===================================================== */
+    .panel {
+        background: linear-gradient(145deg, rgba(48, 32, 22, 0.82), rgba(25, 17, 11, 0.78));
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 24px 26px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .panel__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+
+    .panel__title { color: var(--cream-light); font-size: 18px; font-weight: 700; }
+
+    .panel__link { color: var(--gold); font-size: 13px; font-weight: 600; transition: 0.3s; }
+    .panel__link:hover { color: var(--gold-light); text-decoration: underline; }
+
+    /* =====================================================
+       TRANSACTIONS
+    ===================================================== */
+    .tx-list { list-style: none; display: grid; gap: 10px; }
+
+    .tx {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(217, 173, 85, 0.10);
+        transition: background 0.3s, border-color 0.3s;
+    }
+
+    .tx:hover { background: rgba(217, 173, 85, 0.07); border-color: rgba(217, 173, 85, 0.28); }
+
+    .tx__left { display: flex; flex-direction: column; gap: 2px; }
+    .tx__cat { color: var(--cream-light); font-weight: 600; font-size: 14px; }
+    .tx__date { color: var(--text-muted); font-size: 12px; font-family: Arial, sans-serif; }
+    .tx__amount { font-weight: 700; font-size: 15px; font-family: Arial, sans-serif; }
+    .tx__amount--in { color: #7be495; }
+    .tx__amount--out { color: #ff8c8c; }
+
+    .tx-empty {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    /* =====================================================
+       OBJECTIFS
+    ===================================================== */
+    .obj-list { list-style: none; display: grid; gap: 14px; }
+
+    .obj {
+        padding: 14px 16px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(217, 173, 85, 0.10);
+    }
+
+    .obj__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .obj__name { color: var(--cream-light); font-weight: 600; font-size: 14px; }
+    .obj__pct { color: var(--gold); font-weight: 700; font-size: 13px; font-family: Arial, sans-serif; }
+
+    .obj__bar {
+        width: 100%;
+        height: 6px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+    }
+
+    .obj__fill {
+        height: 100%;
+        border-radius: 6px;
+        background: linear-gradient(90deg, var(--brown-light), var(--gold));
+        transition: width 0.6s;
+    }
+
+    /* =====================================================
+       BOUTONS
+    ===================================================== */
+    .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 46px;
+        padding: 0 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn--primary {
+        color: #24170d;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        box-shadow: 0 6px 20px rgba(191, 140, 55, 0.35);
+    }
+
+    .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(191, 140, 55, 0.55);
+        filter: brightness(1.06);
+    }
+
+    .btn--ghost {
+        color: var(--gold-light);
+        background: rgba(217, 173, 85, 0.08);
+        border: 1px solid rgba(217, 173, 85, 0.55);
+    }
+
+    .btn--ghost:hover {
+        background: rgba(217, 173, 85, 0.18);
+        transform: translateY(-2px);
+    }
+
+    /* =====================================================
+       RESPONSIVE — spécifique dashboard
+       (la navbar et la bottom nav sont dans base.html)
+    ===================================================== */
+    @media (max-width: 750px) {
+        .container {
+            padding: 90px 20px 90px;
+        }
+
+        .countdown {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 22px 22px;
+        }
+
+        .countdown__right {
+            text-align: left;
+            width: 100%;
+        }
+
+        .countdown__days { font-size: 32px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <span class="page-header__small">BONJOUR</span>
+            <h1>{{ utilisateur.nom_complet|default:request.user.nom_complet }}, <span>voici votre tableau de bord.</span></h1>
+            <p>Suivez vos finances en temps réel et anticipez votre prochaine rentrée d'argent.</p>
+        </div>
+
+        <!-- MESSAGES -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert--{{ message.tags|default:'success' }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- STATS -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat__label">Solde disponible</div>
+                <div class="stat__value {% if solde < 0 %}stat__value--negative{% else %}stat__value--gold{% endif %}">
+                    {{ solde|floatformat:0 }} {{ request.user.devise }}
+                </div>
+                <div class="stat__hint">Calculé sur l'ensemble des transactions</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat__label">Revenus totaux</div>
+                <div class="stat__value stat__value--positive">
+                    + {{ revenus|floatformat:0 }} {{ request.user.devise }}
+                </div>
+                <div class="stat__hint">Toutes sources confondues</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat__label">Dépenses totales</div>
+                <div class="stat__value stat__value--negative">
+                    − {{ depenses|floatformat:0 }} {{ request.user.devise }}
+                </div>
+                <div class="stat__hint">Cumul des dépenses enregistrées</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat__label">Projection</div>
+                <div class="stat__value stat__value--gold">
+                    {% if projection_jours %}
+                        {{ projection_jours }} jours
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+                <div class="stat__hint">
+                    {% if projection_jours %}
+                        À ce rythme, vous serez à sec dans {{ projection_jours }} jours
+                    {% else %}
+                        Pas encore assez de données
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPTE À REBOURS -->
+        <div class="countdown">
+            <div class="countdown__left">
+                <span class="countdown__label">Prochaine rentrée d'argent</span>
+                <span class="countdown__days">
+                    {{ jours_paie }}
+                    <span>jour{{ jours_paie|pluralize }}</span>
+                </span>
+            </div>
+            <div class="countdown__right">
+                <p>Prévu le</p>
+                <strong>{{ prochaine_paie|date:"d F Y" }}</strong>
+            </div>
+        </div>
+
+        <!-- FEEDBACK PRODUIT -->
+        {% include "finances/_feedback_carte.html" %}
+
+        <!-- GRILLE : TRANSACTIONS + OBJECTIFS -->
+        <div class="grid-2">
+
+            <div class="panel">
+                <div class="panel__header">
+                    <h2 class="panel__title">Dernières transactions</h2>
+                    <a href="{% url 'transactions' %}" class="panel__link">Voir tout →</a>
+                </div>
+
+                {% if transactions %}
+                    <ul class="tx-list">
+                        {% for tx in transactions %}
+                            <li class="tx">
+                                <div class="tx__left">
+                                    <span class="tx__cat">{{ tx.categorie.nom }}</span>
+                                    <span class="tx__date">{{ tx.date|date:"d M Y" }} · {{ tx.get_canal_declaratif_display }}</span>
+                                </div>
+                                <span class="tx__amount {% if tx.type == 'revenu' %}tx__amount--in{% else %}tx__amount--out{% endif %}">
+                                    {% if tx.type == 'revenu' %}+{% else %}−{% endif %}
+                                    {{ tx.montant|floatformat:0 }} {{ request.user.devise }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="tx-empty">Aucune transaction enregistrée pour le moment.</p>
+                    <div class="cta-row">
+                        <a href="{% url 'transaction_create' %}" class="btn btn--primary">+ Nouvelle transaction</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="panel">
+                <div class="panel__header">
+                    <h2 class="panel__title">Objectifs en cours</h2>
+                    <a href="{% url 'objectifs' %}" class="panel__link">Voir tout →</a>
+                </div>
+
+                {% if objectifs %}
+                    <ul class="obj-list">
+                        {% for obj in objectifs %}
+                            <li class="obj">
+                                <div class="obj__top">
+                                    <span class="obj__name">{{ obj.nom }}</span>
+                                    <span class="obj__pct">{{ obj.progression|floatformat:0 }} %</span>
+                                </div>
+                                <div class="obj__bar">
+                                    <div class="obj__fill" style="width: {{ obj.progression }}%;"></div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="tx-empty">Aucun objectif en cours.</p>
+                    <div class="cta-row">
+                        <a href="{% url 'objectif_create' %}" class="btn btn--primary">+ Nouvel objectif</a>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- CTA RAPIDE -->
+        <div class="cta-row">
+            <a href="{% url 'transaction_create' %}" class="btn btn--primary">+ Nouvelle transaction</a>
+            <a href="{% url 'source_create' %}" class="btn btn--ghost">+ Source de revenu</a>
+            <a href="{% url 'objectif_create' %}" class="btn btn--ghost">+ Objectif</a>
+            <a href="{% url 'dette_create' %}" class="btn btn--ghost">+ Dette</a>
+        </div>
+
+    </div>
+
+{% endblock %}

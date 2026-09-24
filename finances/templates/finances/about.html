@@ -1,0 +1,1387 @@
+{% load static %}
+{% load pwa %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'finances/img/favicon/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'finances/img/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'finances/img/favicon/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'finances/img/favicon/apple-touch-icon.png' %}">
+    <title>Frana — À propos</title>
+    {% progressive_web_app_meta %}
+    <script src="{% static 'finances/js/pwa-install.js' %}" defer></script>
+    <script src="{% static 'finances/js/mobile-menu.js' %}" defer></script>
+    <style>
+        /* =====================================================
+           VARIABLES FRANA
+        ===================================================== */
+        :root {
+            color-scheme: dark;
+
+            --body-font: "Poppins", "Times New Roman", serif;
+
+            --brown-deep: #1e140d;
+            --brown-dark: #302016;
+            --brown: #5b3c22;
+            --brown-light: #8b6235;
+            --gold: #d9ad55;
+            --gold-light: #f0ce82;
+            --cream: #f1e7d7;
+            --cream-light: #fffaf2;
+
+            --text-main: #fffaf2;
+            --text-muted: #d8cbbb;
+
+            --card-bg: rgba(30, 20, 13, 0.72);
+            --card-border: rgba(217, 173, 85, 0.28);
+        }
+
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--body-font);
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(20, 13, 8, 0.55) 0%,
+                    rgba(20, 13, 8, 0.72) 45%,
+                    rgba(20, 13, 8, 0.92) 100%
+                ),
+                url("{% static 'finances/img/pexels-pavel-danilyuk-7654180.jpg' %}")
+                center / cover no-repeat fixed;
+            background-attachment: fixed;
+            color: var(--text-main);
+        }
+
+        a { text-decoration: none; }
+        button { cursor: pointer; border: none; outline: none; }
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 78px;
+            padding: 0 55px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(30, 20, 13, 0.72);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(220, 180, 100, 0.25);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.30);
+            z-index: 1000;
+        }
+
+        .logo { display: flex; align-items: center; }
+
+        .logo img {
+            width: 135px;
+            height: 62px;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 9px;
+            padding: 4px 9px;
+            transition: 0.3s;
+        }
+
+        .logo:hover img { transform: scale(1.04); }
+
+        .menu {
+            position: relative;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            list-style: none;
+        }
+
+        .menu li { position: relative; z-index: 1; }
+
+        .menu li a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            padding: 0 22px;
+            color: #f1e7d7;
+            font-size: 16px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .menu li:hover a { color: #ffffff; }
+        .menu li.active a { color: var(--gold-light); }
+
+        .menu li.active a::after {
+            content: "";
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            border-radius: 4px;
+        }
+
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar__login {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            padding: 0 22px;
+            border-radius: 8px;
+            color: var(--gold-light);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: rgba(217, 173, 85, 0.08);
+            border: 1px solid rgba(217, 173, 85, 0.55);
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+        }
+
+        .navbar__login:hover {
+            transform: translateY(-2px);
+            background: rgba(217, 173, 85, 0.18);
+            box-shadow: 0 10px 28px rgba(191, 140, 55, 0.45);
+        }
+
+        /* =====================================================
+           BURGER (caché par défaut, desktop)
+        ===================================================== */
+        .navbar__burger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 40px;
+            height: 40px;
+            background: rgba(217, 173, 85, 0.08);
+            border: 1px solid rgba(217, 173, 85, 0.45);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .navbar__burger span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            margin: 0 auto;
+            background: var(--gold-light);
+            border-radius: 2px;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        /* =====================================================
+           OVERLAY PLEIN ÉCRAN (menu mobile)
+        ===================================================== */
+        .mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+
+            background:
+                radial-gradient(circle at 50% 15%, rgba(217, 173, 85, 0.18), transparent 55%),
+                linear-gradient(160deg, var(--brown-deep) 0%, #1e140d 100%);
+
+            transform: translateX(100%);
+            transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .mobile-menu-overlay.open {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-logo {
+            position: absolute;
+            top: 26px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: auto;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 4px 8px;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 22px;
+            right: 22px;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            border: 1px solid rgba(217, 173, 85, 0.45);
+            background: rgba(217, 173, 85, 0.08);
+            color: var(--gold-light);
+            font-size: 26px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .mobile-menu-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mobile-menu-links a {
+            position: relative;
+            color: var(--cream);
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            padding: 14px 10px;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: color 0.3s, opacity 0.4s, transform 0.4s;
+        }
+
+        .mobile-menu-overlay.open .mobile-menu-links a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-menu-overlay.open .mobile-menu-links a:nth-child(1) { transition-delay: 0.10s; }
+        .mobile-menu-overlay.open .mobile-menu-links a:nth-child(2) { transition-delay: 0.18s; }
+        .mobile-menu-overlay.open .mobile-menu-links a:nth-child(3) { transition-delay: 0.26s; }
+
+        .mobile-menu-links a::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 6px;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            transform: translateX(-50%);
+            transition: width 0.3s;
+        }
+
+        .mobile-menu-links a:hover::after,
+        .mobile-menu-links a:active::after,
+        .mobile-menu-links a.active-mobile::after {
+            width: 36px;
+        }
+
+        .mobile-menu-links a.active-mobile {
+            color: var(--gold-light);
+        }
+
+        .mobile-menu-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            width: 78%;
+            max-width: 320px;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.4s, transform 0.4s;
+            transition-delay: 0.34s;
+        }
+
+        .mobile-menu-overlay.open .mobile-menu-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-menu-actions .navbar__login {
+            width: 100%;
+            height: 52px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* =====================================================
+           CONTAINER
+        ===================================================== */
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 130px 30px 60px;
+        }
+
+        /* =====================================================
+           HERO À PROPOS
+        ===================================================== */
+        .about-hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .about-hero__small {
+            display: inline-block;
+            color: var(--gold);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 14px;
+        }
+
+        .about-hero h1 {
+            font-size: clamp(32px, 4.5vw, 54px);
+            font-weight: 700;
+            color: var(--cream-light);
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .about-hero h1 span { color: var(--gold); }
+
+        .about-hero p {
+            max-width: 780px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.7;
+            font-family: Arial, sans-serif;
+        }
+
+        /* =====================================================
+           SECTION GÉNÉRIQUE
+        ===================================================== */
+        .section {
+            margin-bottom: 56px;
+        }
+
+        .section__head {
+            margin-bottom: 26px;
+        }
+
+        .section__head small {
+            display: inline-block;
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .section__head h2 {
+            font-size: clamp(24px, 3vw, 34px);
+            font-weight: 700;
+            color: var(--cream-light);
+            line-height: 1.15;
+        }
+
+        .section__head h2 span { color: var(--gold); }
+
+        /* =====================================================
+           CARTES GLASSMORPHISM
+        ===================================================== */
+        .card {
+            background: linear-gradient(
+                145deg,
+                rgba(48, 32, 22, 0.82),
+                rgba(25, 17, 11, 0.78)
+            );
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 30px 32px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 20px 50px -20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12%;
+            width: 76%;
+            height: 1.5px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--gold),
+                var(--gold-light),
+                transparent
+            );
+            border-radius: 10px;
+        }
+
+        /* =====================================================
+           MISSION
+        ===================================================== */
+        .mission {
+            font-size: 15px;
+            color: var(--cream);
+            line-height: 1.75;
+            font-family: Arial, sans-serif;
+        }
+
+        .mission p + p {
+            margin-top: 16px;
+        }
+
+        .mission strong { color: var(--gold); font-weight: 700; }
+
+        /* =====================================================
+           PERSONA
+        ===================================================== */
+        .persona-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 18px;
+        }
+
+        .persona {
+            background: linear-gradient(
+                145deg,
+                rgba(48, 32, 22, 0.82),
+                rgba(25, 17, 11, 0.78)
+            );
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 22px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 20px 50px -20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .persona:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 25px 55px -20px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(217, 173, 85, 0.25);
+        }
+
+        .persona__icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(217, 173, 85, 0.12);
+            border: 1px solid rgba(217, 173, 85, 0.30);
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .persona__icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .persona__name {
+            color: var(--cream-light);
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .persona__desc {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.5;
+            font-family: Arial, sans-serif;
+        }
+
+        /* =====================================================
+           CAS D'USAGE
+        ===================================================== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .feature {
+            background: linear-gradient(
+                145deg,
+                rgba(48, 32, 22, 0.82),
+                rgba(25, 17, 11, 0.78)
+            );
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 26px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 20px 50px -20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12%;
+            width: 76%;
+            height: 1.5px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--gold),
+                var(--gold-light),
+                transparent
+            );
+            border-radius: 10px;
+        }
+
+        .feature:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 25px 55px -20px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(217, 173, 85, 0.25);
+        }
+
+        .feature__icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: rgba(217, 173, 85, 0.12);
+            border: 1px solid rgba(217, 173, 85, 0.30);
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .feature__icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .feature__title {
+            color: var(--cream-light);
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature__desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: Arial, sans-serif;
+        }
+
+        /* =====================================================
+           AFRIQUE / SAAS SPÉCIAL
+        ===================================================== */
+        .africa-card {
+            background: linear-gradient(
+                135deg,
+                rgba(139, 98, 53, 0.35),
+                rgba(48, 32, 22, 0.85)
+            );
+            border: 1px solid rgba(217, 173, 85, 0.40);
+            border-radius: 18px;
+            padding: 34px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 20px 50px -20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 26px;
+            align-items: center;
+        }
+
+        .africa-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--gold), var(--gold-light));
+        }
+
+        .africa-card__icon {
+            width: 68px;
+            height: 68px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            background: rgba(217, 173, 85, 0.15);
+            border: 1px solid rgba(217, 173, 85, 0.40);
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .africa-card__icon svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .africa-card__title {
+            color: var(--cream-light);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .africa-card__title span { color: var(--gold); }
+
+        .africa-card__desc {
+            color: var(--cream);
+            font-size: 15px;
+            line-height: 1.7;
+            font-family: Arial, sans-serif;
+        }
+
+        .africa-card__desc strong { color: var(--gold); }
+
+        @media (max-width: 640px) {
+            .africa-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+            }
+        }
+
+        /* =====================================================
+           FONDATEUR
+        ===================================================== */
+        .founder {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 34px;
+            align-items: center;
+            background: linear-gradient(
+                145deg,
+                rgba(48, 32, 22, 0.82),
+                rgba(25, 17, 11, 0.78)
+            );
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 34px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 20px 50px -20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .founder::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12%;
+            width: 76%;
+            height: 2px;
+            border-radius: 10px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--gold),
+                var(--gold-light),
+                transparent
+            );
+        }
+
+        .founder__photo {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid rgba(217, 173, 85, 0.35);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .founder__photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .founder__info h3 {
+            color: var(--cream-light);
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .founder__role {
+            color: var(--gold);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            font-family: Arial, sans-serif;
+        }
+
+        .founder__bio {
+            color: var(--cream);
+            font-size: 15px;
+            line-height: 1.75;
+            font-family: Arial, sans-serif;
+        }
+
+        .founder__bio + .founder__bio { margin-top: 12px; }
+
+        .founder__tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: Arial, sans-serif;
+            color: var(--gold-light);
+            background: rgba(217, 173, 85, 0.10);
+            border: 1px solid rgba(217, 173, 85, 0.35);
+        }
+
+        @media (max-width: 750px) {
+            .founder {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+            }
+            .founder__photo {
+                max-width: 220px;
+            }
+            .founder__tags { justify-content: center; }
+        }
+
+        /* =====================================================
+           VALEURS
+        ===================================================== */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .value {
+            background: linear-gradient(
+                145deg,
+                rgba(48, 32, 22, 0.82),
+                rgba(25, 17, 11, 0.78)
+            );
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 24px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 20px 50px -20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .value__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(217, 173, 85, 0.12);
+            border: 1px solid rgba(217, 173, 85, 0.30);
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .value__icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .value__title {
+            color: var(--cream-light);
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .value__desc {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.55;
+            font-family: Arial, sans-serif;
+        }
+
+        /* =====================================================
+           CTA FINAL
+        ===================================================== */
+        .cta {
+            text-align: center;
+            padding: 50px 30px;
+            background: linear-gradient(
+                145deg,
+                rgba(139, 98, 53, 0.30),
+                rgba(48, 32, 22, 0.85)
+            );
+            border: 1px solid rgba(217, 173, 85, 0.40);
+            border-radius: 20px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 20px 50px -20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .cta h2 {
+            color: var(--cream-light);
+            font-size: clamp(22px, 3vw, 30px);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta h2 span { color: var(--gold); }
+
+        .cta p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 26px;
+            font-family: Arial, sans-serif;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .cta__actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 48px;
+            padding: 0 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+            border: none;
+        }
+
+        .btn__icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .btn--primary {
+            color: #24170d;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            box-shadow: 0 6px 20px rgba(191, 140, 55, 0.35);
+        }
+
+        .btn--primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(191, 140, 55, 0.55);
+            filter: brightness(1.06);
+        }
+
+        .btn--ghost {
+            color: var(--gold-light);
+            background: rgba(217, 173, 85, 0.08);
+            border: 1px solid rgba(217, 173, 85, 0.55);
+        }
+
+        .btn--ghost:hover {
+            background: rgba(217, 173, 85, 0.18);
+            transform: translateY(-2px);
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+        .footer {
+            text-align: center;
+            padding: 40px 20px 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            border-top: 1px solid rgba(217, 173, 85, 0.15);
+            margin-top: 40px;
+        }
+
+        .footer strong { color: var(--gold); }
+
+        /* =====================================================
+           RESPONSIVE — NAVBAR (aligné sur landing.html)
+        ===================================================== */
+        @media (max-width: 1000px) {
+            .navbar { padding: 0 25px; }
+            .menu li a {
+                padding: 0 12px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .navbar {
+                height: 62px;
+                min-height: 62px;
+                padding: 0 20px;
+                flex-direction: row;
+            }
+
+            .logo img {
+                width: 100px;
+                height: 44px;
+            }
+
+            .navbar .menu,
+            .navbar > .navbar__actions {
+                display: none;
+            }
+
+            .navbar__burger {
+                display: flex;
+            }
+
+            .container {
+                padding: 100px 20px 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="{% url 'accueil' %}" class="logo">
+            <img src="{% static 'finances/img/logo.png' %}" alt="FRANA">
+        </a>
+
+        <ul class="menu">
+            <li><a href="{% url 'accueil' %}">Accueil</a></li>
+            <li class="active"><a href="{% url 'about' %}">À propos</a></li>
+            <li><a href="{% url 'fonctionnalites' %}">Fonctionnalités</a></li>
+        </ul>
+
+        <div class="navbar__actions">
+            <a href="{% url 'connexion' %}" class="navbar__login">Se connecter</a>
+        </div>
+
+        <!-- BURGER (mobile uniquement) -->
+        <button class="navbar__burger" id="franaBurger" aria-label="Ouvrir le menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- MENU PLEIN ÉCRAN (mobile uniquement) -->
+    <div class="mobile-menu-overlay" id="franaMobileMenu">
+        <img src="{% static 'finances/img/logo.png' %}" alt="FRANA" class="mobile-menu-logo">
+        <button class="mobile-menu-close" id="franaMobileClose" aria-label="Fermer le menu">&times;</button>
+
+        <nav class="mobile-menu-links">
+            <a href="{% url 'accueil' %}">Accueil</a>
+            <a href="{% url 'about' %}" class="active-mobile">À propos</a>
+            <a href="{% url 'fonctionnalites' %}">Fonctionnalités</a>
+        </nav>
+
+        <div class="mobile-menu-actions">
+            <a href="{% url 'connexion' %}" class="navbar__login">Se connecter</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- HERO -->
+        <div class="about-hero">
+            <span class="about-hero__small">À PROPOS DE FRANA</span>
+            <h1>Un SaaS de gestion financière <span>pensé pour l'Afrique.</span></h1>
+            <p>
+                Frana est un logiciel de gestion de finances personnelles conçu spécifiquement
+                pour les personnes à revenu fixe périodique en Afrique — salariés, freelances
+                à revenus récurrents, retraités, bailleurs et bénéficiaires d'allocations.
+            </p>
+        </div>
+
+        <!-- MISSION -->
+        <section class="section">
+            <div class="card">
+                <div class="section__head">
+                    <small>NOTRE MISSION</small>
+                    <h2>Rendre la gestion financière <span>simple, concrète et accessible.</span></h2>
+                </div>
+                <div class="mission">
+                    <p>
+                        En Afrique, la majorité des personnes à revenu fixe gèrent leur argent
+                        <strong>au jour le jour</strong> : une paie qui tombe une fois par mois,
+                        des dépenses régulières (loyer, transport, marché, factures), des
+                        engagements familiaux, une tontine, une épargne informelle.
+                    </p>
+                    <p>
+                        Frana part de ce constat et propose un outil <strong>adapté à cette réalité</strong> :
+                        un compte à rebours avant la prochaine rentrée d'argent, une projection
+                        « à ce rythme, vous serez à sec dans X jours », un suivi visuel des
+                        objectifs d'épargne (terrain, scolarité, pèlerinage…), et un registre
+                        clair des dettes et crédits informels.
+                    </p>
+                    <p>
+                        Pas de connexion bancaire, pas de dépendance à un système financier
+                        complexe : <strong>l'utilisateur déclare lui-même ses transactions</strong>
+                        et Frana fait le reste.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- POURQUOI L'AFRIQUE -->
+        <section class="section">
+            <div class="africa-card">
+                <div class="africa-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M2 12h20"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="africa-card__title">
+                        Un <span>SaaS spécialement conçu pour l'Afrique.</span>
+                    </div>
+                    <div class="africa-card__desc">
+                        Frana n'est pas une adaptation d'un outil occidental. C'est une plateforme
+                        née de la réalité africaine : <strong>revenus périodiques</strong>,
+                        <strong>dépenses informelles</strong>, <strong>dettes entre proches</strong>,
+                        <strong>tontines</strong>, <strong>transferts familiaux</strong>,
+                        <strong>cérémonies</strong>. L'interface, les catégories par défaut
+                        (marché/nourriture, taxi-moto, culte, tontine, cérémonies…), les devises
+                        (XAF, XOF, USD) et la logique de compte à rebours avant la paie
+                        reflètent cette réalité.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PERSONA -->
+        <section class="section">
+            <div class="section__head">
+                <small>POUR QUI ?</small>
+                <h2>Pensé pour les <span>revenus réguliers.</span></h2>
+            </div>
+
+            <div class="persona-grid">
+
+                <div class="persona">
+                    <div class="persona__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="persona__name">Salarié (privé, public, ONG)</div>
+                    <div class="persona__desc">Revenu mensuel fiable, source unique.</div>
+                </div>
+
+                <div class="persona">
+                    <div class="persona__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2"/>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                        </svg>
+                    </div>
+                    <div class="persona__name">Freelance / consultant</div>
+                    <div class="persona__desc">Plusieurs sources possibles, léger risque de retard.</div>
+                </div>
+
+                <div class="persona">
+                    <div class="persona__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
+                            <path d="M9 21v-6h6v6"/>
+                        </svg>
+                    </div>
+                    <div class="persona__name">Retraité / pensionné</div>
+                    <div class="persona__desc">Source unique, très stable.</div>
+                </div>
+
+                <div class="persona">
+                    <div class="persona__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 10 12 3l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <path d="M9 21v-8h6v8"/>
+                        </svg>
+                    </div>
+                    <div class="persona__name">Propriétaire bailleur</div>
+                    <div class="persona__desc">Une source par bien loué, risque de retard locataire.</div>
+                </div>
+
+                <div class="persona">
+                    <div class="persona__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                        </svg>
+                    </div>
+                    <div class="persona__name">Bénéficiaire de bourse / allocation</div>
+                    <div class="persona__desc">Source externe, parfois irrégulière.</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CAS D'USAGE -->
+        <section class="section">
+            <div class="section__head">
+                <small>CE QUE FAIT FRANA</small>
+                <h2>Quatre <span>cas d'usage prioritaires.</span></h2>
+            </div>
+
+            <div class="features-grid">
+
+                <div class="feature">
+                    <div class="feature__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="M7 14l4-4 4 4 5-5"/>
+                        </svg>
+                    </div>
+                    <div class="feature__title">Suivi quotidien</div>
+                    <div class="feature__desc">
+                        Enregistrement manuel des transactions (montant, catégorie, date,
+                        canal déclaratif) avec un solde disponible calculé en temps réel.
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+                    <div class="feature__title">Compte à rebours avant la paie</div>
+                    <div class="feature__desc">
+                        « Il vous reste X jours avant votre prochain revenu » et projection
+                        « à ce rythme, vous serez à sec dans X jours ».
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="6"/>
+                            <circle cx="12" cy="12" r="2"/>
+                        </svg>
+                    </div>
+                    <div class="feature__title">Épargne et objectifs</div>
+                    <div class="feature__desc">
+                        Objectifs concrets (terrain, construction, dot, rentrée scolaire,
+                        véhicule, pèlerinage) avec suivi visuel de la progression.
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 17l9.2-9.2M17 17V7H7"/>
+                        </svg>
+                    </div>
+                    <div class="feature__title">Dettes et crédits informels</div>
+                    <div class="feature__desc">
+                        Suivi de l'argent emprunté et prêté (collègues, amis, boutiques
+                        à crédit) avec rappels de remboursement dans les deux sens.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VALEURS -->
+        <section class="section">
+            <div class="section__head">
+                <small>NOS PRINCIPES</small>
+                <h2>Trois valeurs <span>qui guident Frana.</span></h2>
+            </div>
+
+            <div class="values-grid">
+
+                <div class="value">
+                    <div class="value__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="value__title">Simplicité radicale</div>
+                    <div class="value__desc">
+                        Pas de jargon, pas d'onglets inutiles. Les fonctionnalités clés
+                        sont accessibles en un clic, pensées pour un usage mobile.
+                    </div>
+                </div>
+
+                <div class="value">
+                    <div class="value__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <div class="value__title">Confidentialité</div>
+                    <div class="value__desc">
+                        Vos données financières restent les vôtres. Aucune connexion
+                        bancaire, aucune revente, aucun profilage publicitaire.
+                    </div>
+                </div>
+
+                <div class="value">
+                    <div class="value__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.3a2 2 0 0 0 2-1.7l1.4-9a2 2 0 0 0-2-2.3z"/>
+                            <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                        </svg>
+                    </div>
+                    <div class="value__title">Ancrage africain</div>
+                    <div class="value__desc">
+                        Catégories, devises et logique métier adaptées au continent.
+                        Frana est un produit africain, pour des utilisateurs africains.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FONDATEUR -->
+        <section class="section">
+            <div class="section__head">
+                <small>DERRIÈRE FRANA</small>
+                <h2>Un projet porté par <span>un ingénieur logiciel.</span></h2>
+            </div>
+
+            <div class="founder">
+                <div class="founder__photo">
+                    <img src="{% static 'finances/img/franck.jpg' %}"
+                         alt="Nkou-Ampa Franck Emmanuel">
+                </div>
+
+                <div class="founder__info">
+                    <h3>Nkou-Ampa Franck Emmanuel</h3>
+                    <div class="founder__role">Ingénieur logiciel — Fondateur de Frana</div>
+
+                    <div class="founder__bio">
+                        Ingénieur logiciel, je conçois et développe Frana avec une conviction simple :
+                        l'outil financier doit s'adapter à la réalité de l'utilisateur africain,
+                        et non l'inverse.
+                    </div>
+
+                    <div class="founder__bio">
+                        Chaque fonctionnalité de Frana est pensée pour répondre à un besoin concret :
+                        anticiper la paie, savoir combien il reste jusqu'à la prochaine rentrée
+                        d'argent, mettre de côté pour un projet, garder une trace claire de ses
+                        dettes informelles. Rien de plus, rien de moins.
+                    </div>
+
+                    <div class="founder__tags">
+                        <span class="tag">Ingénierie logicielle</span>
+                        <span class="tag">Django / Python</span>
+                        <span class="tag">Produit SaaS</span>
+                        <span class="tag">Fintech Afrique</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="section">
+            <div class="cta">
+                <h2>Prêt à reprendre le contrôle <span>de vos finances ?</span></h2>
+                <p>
+                    Essai complet de 30 jours — le temps d'un cycle de paie entier —
+                    pour tester la fonctionnalité phare de Frana : le compte à rebours
+                    avant votre prochain revenu.
+                </p>
+
+                <div class="cta__actions">
+                    <a href="{% url 'inscription' %}" class="btn btn--primary">
+                        <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                        Commencer l'essai gratuit
+                    </a>
+                    <a href="{% url 'connexion' %}" class="btn btn--ghost">
+                        Se connecter
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <strong>Frana</strong> — SaaS de gestion des finances Made in Africa.
+            <br>
+            © 2026 — Nkou-Ampa Franck Emmanuel. Tous droits réservés.
+        </footer>
+
+    </div>
+
+</body>
+</html>

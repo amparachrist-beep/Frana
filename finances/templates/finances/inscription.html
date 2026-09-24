@@ -1,0 +1,735 @@
+{% load static %}
+{% load pwa %}
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="{% static 'finances/img/favicon/favicon.ico' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'finances/img/favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'finances/img/favicon/favicon-16x16.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'finances/img/favicon/apple-touch-icon.png' %}">
+  <title>Frana — Connexion</title>
+  {% progressive_web_app_meta %}
+  <script src="{% static 'finances/js/pwa-install.js' %}" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    /* =====================================================
+       VARIABLES FRANA
+    ===================================================== */
+    :root {
+      --white-color: #ffffff;
+      --black-color: #000000;
+      --body-font: "Poppins", sans-serif;
+      --h1-font-size: 1.75rem;
+      --normal-font-size: 1rem;
+      --small-font-size: .813rem;
+      --font-medium: 500;
+      --font-semibold: 600;
+
+      --brown-deep: #1e140d;
+      --brown-dark: #302016;
+      --brown: #5b3c22;
+      --brown-light: #8b6235;
+      --gold: #d9ad55;
+      --gold-light: #f0ce82;
+      --cream: #f1e7d7;
+      --cream-light: #fffaf2;
+
+      --text-main: #fffaf2;
+      --text-muted: #d8cbbb;
+      --text-dark: #2a1b10;
+
+      --card-bg: rgba(30, 20, 13, 0.72);
+      --card-border: rgba(217, 173, 85, 0.28);
+    }
+
+    /* =====================================================
+       RESET
+    ===================================================== */
+    * { box-sizing: border-box; padding: 0; margin: 0; }
+
+    body, input, button {
+      font-size: var(--normal-font-size);
+      font-family: var(--body-font);
+    }
+
+    body { color: var(--text-main); background: #1e140d; }
+    input, button { border: none; outline: none; }
+    a { text-decoration: none; }
+    img { max-width: 100%; height: auto; }
+
+    /* =====================================================
+       PAGE INSCRIPTION
+    ===================================================== */
+    .login {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      align-items: center;
+      justify-content: center;
+      padding-block: 2.5rem;
+      overflow: hidden;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(20, 13, 8, 0.18) 0%,
+          rgba(20, 13, 8, 0.38) 45%,
+          rgba(20, 13, 8, 0.78) 100%
+        ),
+        url("{% static 'finances/img/pexels-pavel-danilyuk-7654180.jpg' %}")
+        center / cover no-repeat fixed;
+      background-attachment: fixed;
+    }
+
+    .login::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(217, 173, 85, 0.10), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(139, 98, 53, 0.12), transparent 45%);
+      pointer-events: none;
+    }
+
+    /* =====================================================
+       BRAND
+    ===================================================== */
+    .login__brand {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      row-gap: 0.4rem;
+      margin-bottom: 1.5rem;
+      z-index: 2;
+    }
+
+    .login__brand-mark {
+      width: 4.25rem;
+      height: 4.25rem;
+      display: grid;
+      place-items: center;
+      margin-bottom: 0.35rem;
+      padding: 6px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.30);
+    }
+
+    .login__brand-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 14px rgba(120, 80, 30, 0.20));
+    }
+
+    .login__brand-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .login__brand-tag {
+      font-size: var(--small-font-size);
+      color: var(--cream);
+      letter-spacing: 0.02em;
+      opacity: 0.85;
+    }
+
+    /* =====================================================
+       FORMULAIRE
+    ===================================================== */
+    .login__form {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(145deg, rgba(48, 32, 22, 0.84), rgba(25, 17, 11, 0.80));
+      border: 1px solid var(--card-border);
+      margin-inline: 1.5rem;
+      padding: 2.5rem 1.5rem;
+      border-radius: 1.25rem;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow:
+        0 25px 60px -25px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .login__form::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 12%;
+      width: 76%;
+      height: 2px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), transparent);
+    }
+
+    /* =====================================================
+       TITRE
+    ===================================================== */
+    .login__title {
+      text-align: center;
+      font-size: var(--h1-font-size);
+      font-weight: var(--font-semibold);
+      margin-bottom: 2rem;
+      text-transform: capitalize;
+      color: var(--cream-light);
+    }
+
+    /* =====================================================
+       MESSAGES / ALERTES
+    ===================================================== */
+    .login__alert {
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      border-radius: 0.6rem;
+      font-size: var(--small-font-size);
+      line-height: 1.4;
+    }
+
+    .login__alert--error {
+      background: rgba(191, 60, 60, 0.15);
+      border: 1px solid rgba(230, 100, 100, 0.4);
+      color: #ffd4d4;
+    }
+
+    .login__alert--success {
+      background: rgba(80, 180, 100, 0.15);
+      border: 1px solid rgba(100, 220, 120, 0.4);
+      color: #d4ffdd;
+    }
+
+    /* =====================================================
+       CONTENT / BOX
+    ===================================================== */
+    .login__content, .login__box { display: grid; }
+    .login__content { row-gap: 1.75rem; margin-bottom: 1.5rem; }
+
+    .login__box {
+      grid-template-columns: max-content 1fr;
+      align-items: center;
+      column-gap: 0.75rem;
+      border-bottom: 2px solid rgba(217, 173, 85, 0.25);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .login__box:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 2px 0 rgba(217, 173, 85, 0.15);
+    }
+
+    .login__icon, .login__eye {
+      font-size: 1.25rem;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+    }
+
+    .login__icon svg, .login__eye svg {
+      width: 1.15rem;
+      height: 1.15rem;
+    }
+
+    .login__input {
+      width: 100%;
+      padding-block: 0.8rem;
+      background: transparent;
+      color: var(--cream-light);
+      position: relative;
+      z-index: 1;
+    }
+
+    .login__input::placeholder { color: transparent; }
+    .login__box-input { position: relative; }
+
+    .login__label {
+      position: absolute;
+      left: 0;
+      top: 13px;
+      font-weight: var(--font-medium);
+      color: var(--text-muted);
+      transition: top 0.3s, font-size 0.3s, color 0.3s;
+      pointer-events: none;
+    }
+
+    .login__eye {
+      position: absolute;
+      right: 0;
+      top: 18px;
+      z-index: 10;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .login__eye:hover { color: var(--gold-light); }
+    .login__box:has(.login__eye) input { padding-right: 1.8rem; }
+
+    /* =====================================================
+       CHECKBOX
+    ===================================================== */
+    .login__check, .login__check-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .login__check { margin-bottom: 1.75rem; }
+
+    .login__check-label, .login__forgot, .login__register {
+      font-size: var(--small-font-size);
+    }
+
+    .login__check-label { color: var(--text-muted); }
+
+    .login__check-label a {
+      color: var(--gold);
+      font-weight: var(--font-medium);
+      transition: 0.3s;
+    }
+
+    .login__check-label a:hover {
+      color: var(--gold-light);
+      text-decoration: underline;
+    }
+
+    .login__check-group {
+      column-gap: 0.5rem;
+      justify-content: flex-start;
+    }
+
+    .login__check-input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--gold);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* =====================================================
+       BOUTON
+    ===================================================== */
+    .login__button {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.6rem;
+      background: linear-gradient(135deg, var(--brown-light), var(--gold));
+      color: #24170d;
+      font-weight: var(--font-semibold);
+      cursor: pointer;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 25px rgba(191, 140, 55, 0.25);
+      transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .login__button:hover {
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(191, 140, 55, 0.40);
+    }
+
+    .login__button:active { transform: translateY(1px); }
+
+    /* =====================================================
+       LIEN INSCRIPTION / CONNEXION
+    ===================================================== */
+    .login__register {
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .login__register a {
+      color: var(--gold);
+      font-weight: var(--font-semibold);
+      transition: 0.3s;
+    }
+
+    .login__register a:hover {
+      color: var(--gold-light);
+      text-decoration: underline;
+    }
+
+    /* =====================================================
+       LABEL FLOTTANT
+    ===================================================== */
+    .login__input:focus + .login__label,
+    .login__input:not(:placeholder-shown) + .login__label {
+      top: -12px;
+      font-size: var(--small-font-size);
+      color: var(--gold);
+    }
+
+    /* =====================================================
+       ERREURS DE CHAMP
+    ===================================================== */
+    .login__field-error {
+      color: #ffb3b3;
+      font-size: 0.75rem;
+      margin-top: 0.35rem;
+      display: block;
+      line-height: 1.35;
+    }
+
+    /* =====================================================
+       BLOC CHAMP + ERREUR
+    ===================================================== */
+    .login__field {
+      display: grid;
+      row-gap: 0.25rem;
+    }
+
+    /* =====================================================
+       DESKTOP
+    ===================================================== */
+    @media screen and (min-width: 576px) {
+      .login__form {
+        width: 432px;
+        padding: 3.5rem 3rem;
+        border-radius: 1.5rem;
+      }
+      .login__title { font-size: 2rem; }
+    }
+
+    /* =====================================================
+       MOBILE
+    ===================================================== */
+    @media screen and (max-width: 575px) {
+      .login {
+        padding: 20px;
+        background-position: center;
+      }
+      .login__form {
+        margin-inline: 0;
+        width: calc(100vw - 40px);
+        max-width: 432px;
+        padding: 2.5rem 1.5rem;
+      }
+      .login__brand-name { font-size: 1.4rem; }
+    }
+      /* === SELECTS — anti-blanc === */
+.login__box-input select {
+    width: 100%;
+    padding-block: 0.8rem;
+    padding-right: 1.8rem;
+    background: transparent !important;
+    border: none;
+    outline: none;
+    color: var(--cream-light);
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.login__box-input select option {
+    background: #2a1b10 !important;
+    color: #fffaf2 !important;
+}
+
+.login__box-input:has(select)::after {
+    content: "";
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid var(--gold);
+    border-bottom: 2px solid var(--gold);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.login__box-input select + .login__label,
+.login__box-input select ~ .login__label {
+    top: -12px;
+    font-size: var(--small-font-size);
+    color: var(--gold);
+}
+
+/* === AUTOCOMPLETE anti-blanc === */
+.login__input:-webkit-autofill,
+.login__input:-webkit-autofill:hover,
+.login__input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--cream-light);
+    -webkit-box-shadow: 0 0 0 1000px transparent inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+  </style>
+</head>
+<body>
+  <div class="login">
+    <form method="post" action="{% url 'inscription' %}" class="login__form" novalidate>
+      {% csrf_token %}
+
+      {# ---------- BANNIÈRE (logo + nom) ---------- #}
+      <div class="login__brand">
+        <div class="login__brand-mark">
+          <img src="{% static 'finances/img/logo.png' %}" alt="Frana">
+        </div>
+        <span class="login__brand-name">Frana</span>
+        <span class="login__brand-tag">Votre gestion financière, plus simple</span>
+      </div>
+
+      <h1 class="login__title">Inscription</h1>
+
+      {# ---------- MESSAGES DJANGO ---------- #}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="login__alert login__alert--{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {# ---------- ERREURS GLOBALES ---------- #}
+      {% if form.non_field_errors %}
+        <div class="login__alert login__alert--error">
+          {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="login__content">
+
+        {# ---------- NOM COMPLET ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.nom_complet }}
+              <label for="{{ form.nom_complet.id_for_label }}" class="login__label">
+                Nom complet
+              </label>
+            </div>
+          </div>
+          {% if form.nom_complet.errors %}
+            <span class="login__field-error">{{ form.nom_complet.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+        {# ---------- TÉLÉPHONE ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.telephone }}
+              <label for="{{ form.telephone.id_for_label }}" class="login__label">
+                Téléphone
+              </label>
+            </div>
+          </div>
+          {% if form.telephone.errors %}
+            <span class="login__field-error">{{ form.telephone.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+        {# ---------- EMAIL (optionnel) ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <path d="m3 7 9 6 9-6"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.email }}
+              <label for="{{ form.email.id_for_label }}" class="login__label">
+                Adresse e-mail (optionnel)
+              </label>
+            </div>
+          </div>
+          {% if form.email.errors %}
+            <span class="login__field-error">{{ form.email.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+        {# ---------- FRÉQUENCE DE REVENU ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <path d="M16 2v4M8 2v4M3 10h18"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.frequence_revenu }}
+              <label for="{{ form.frequence_revenu.id_for_label }}" class="login__label">
+                Fréquence de revenu
+              </label>
+            </div>
+          </div>
+          {% if form.frequence_revenu.errors %}
+            <span class="login__field-error">{{ form.frequence_revenu.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+        {# ---------- DATE DE PAIE HABITUELLE ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.date_paie_habituelle }}
+              <label for="{{ form.date_paie_habituelle.id_for_label }}" class="login__label">
+                Jour de paie habituel (1-31)
+              </label>
+            </div>
+          </div>
+          {% if form.date_paie_habituelle.errors %}
+            <span class="login__field-error">{{ form.date_paie_habituelle.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+        {# ---------- DEVISE ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v12M9 9h4.5a2.5 2.5 0 0 1 0 5H9h5"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.devise }}
+              <label for="{{ form.devise.id_for_label }}" class="login__label">
+                Devise
+              </label>
+            </div>
+          </div>
+          {% if form.devise.errors %}
+            <span class="login__field-error">{{ form.devise.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+        {# ---------- MOT DE PASSE ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="10" width="16" height="10" rx="2"/>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.password1 }}
+              <label for="{{ form.password1.id_for_label }}" class="login__label">
+                Mot de passe
+              </label>
+              <i class="login__eye" id="signup-eye-1" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </i>
+            </div>
+          </div>
+          {% if form.password1.errors %}
+            <span class="login__field-error">{{ form.password1.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+        {# ---------- CONFIRMATION MOT DE PASSE ---------- #}
+        <div class="login__field">
+          <div class="login__box">
+            <i class="login__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="10" width="16" height="10" rx="2"/>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                <path d="m9 15 2 2 4-4"/>
+              </svg>
+            </i>
+            <div class="login__box-input">
+              {{ form.password2 }}
+              <label for="{{ form.password2.id_for_label }}" class="login__label">
+                Confirmer le mot de passe
+              </label>
+              <i class="login__eye" id="signup-eye-2" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </i>
+            </div>
+          </div>
+          {% if form.password2.errors %}
+            <span class="login__field-error">{{ form.password2.errors|striptags }}</span>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="login__check">
+        <div class="login__check-group">
+          <input type="checkbox" class="login__check-input" id="signup-terms" required>
+          <label for="signup-terms" class="login__check-label">
+            J'accepte les <a href="#">conditions d'utilisation</a>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="login__button">Créer mon compte</button>
+
+      <p class="login__register">
+        Vous avez déjà un compte ?
+        <a href="{% url 'connexion' %}">Se connecter</a>
+      </p>
+    </form>
+  </div>
+
+  <!--<============ Main Js ============-->
+  <script>
+    const showHiddenPass = (loginPass, loginEye) => {
+      const input = document.getElementById(loginPass);
+      const iconEye = document.getElementById(loginEye);
+      if (!input || !iconEye) return;
+
+      iconEye.addEventListener('click', () => {
+        if (input.type === 'password') {
+          input.type = 'text';
+          iconEye.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.8 21.8 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-3.22 4.53M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+        } else {
+          input.type = 'password';
+          iconEye.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+        }
+      });
+    };
+
+    showHiddenPass('{{ form.password1.id_for_label }}', 'signup-eye-1');
+    showHiddenPass('{{ form.password2.id_for_label }}', 'signup-eye-2');
+  </script>
+</body>
+</html>
