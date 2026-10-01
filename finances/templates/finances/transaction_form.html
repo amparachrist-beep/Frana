@@ -5,6 +5,9 @@
 
 {% block extra_css %}
 <style>
+    /* @import doit être tout en haut du <style>, sinon il est ignoré */
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
     /* =====================================================
        VARIABLES FRANA
     ===================================================== */
@@ -28,8 +31,6 @@
         --card-bg: rgba(30, 20, 13, 0.72);
         --card-border: rgba(217, 173, 85, 0.28);
     }
-
-    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
     /* =====================================================
        RESET
@@ -466,4 +467,47 @@
         </div>
 
     </div>
+
+    <!-- =====================================================
+         Filtrage des catégories selon le type choisi
+         On reconstruit la liste des <option> (plus fiable que
+         hidden/disabled sur Safari et mobile).
+    ===================================================== -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const typeField = document.getElementById("id_type");
+        const categorieField = document.getElementById("id_categorie");
+        if (!typeField || !categorieField) return;
+
+        // Copie de toutes les options d'origine
+        const toutesLesOptions = Array.from(categorieField.options).map(function (o) {
+            return o.cloneNode(true);
+        });
+
+        function filtrerCategories() {
+            const type = typeField.value;
+            const valeurActuelle = categorieField.value;
+            let valeurValide = false;
+
+            categorieField.innerHTML = "";
+
+            toutesLesOptions.forEach(function (option) {
+                // Option vide toujours visible ; si aucun type choisi, tout afficher
+                const visible = !option.value || !type || option.dataset.type === type;
+                if (!visible) return;
+
+                categorieField.appendChild(option.cloneNode(true));
+                if (option.value && option.value === valeurActuelle) {
+                    valeurValide = true;
+                }
+            });
+
+            // Si la catégorie sélectionnée n'est plus compatible, on la réinitialise
+            categorieField.value = valeurValide ? valeurActuelle : "";
+        }
+
+        typeField.addEventListener("change", filtrerCategories);
+        filtrerCategories(); // filtrage initial
+    });
+    </script>
 {% endblock %}

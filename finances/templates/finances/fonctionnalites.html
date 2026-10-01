@@ -529,11 +529,12 @@
         .feature-block__title span { color: var(--gold); }
 
         .feature-block__desc {
-            color: var(--text-muted);
-            font-size: 15px;
-            line-height: 1.75;
+            color: var(--cream-light);          /* plus clair que --text-muted */
+            font-size: 16.5px;                  /* au lieu de 15px */
+            line-height: 1.8;
             font-family: Arial, sans-serif;
-            margin-bottom: 22px;
+            margin-bottom: 24px;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
         }
 
         /* Liste des points clés */
@@ -547,18 +548,36 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            color: var(--cream);
-            font-size: 14px;
-            line-height: 1.55;
+            color: var(--cream-light);
+            font-size: 15.5px;                  /* au lieu de 14px */
+            line-height: 1.6;
             font-family: Arial, sans-serif;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
         }
 
         .feature-list li svg {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             flex-shrink: 0;
             margin-top: 3px;
             color: var(--gold);
+        }
+
+        /* Mots mis en valeur dans les textes (couleurs du thème doré) */
+        .hl,
+        .hl-soft {
+            font-family: inherit;   /* évite que le reset * remette Poppins */
+            text-shadow: inherit;
+        }
+
+        .hl {
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+
+        .hl-soft {
+            color: var(--gold);
+            font-weight: 600;
         }
 
         /* =====================================================
@@ -681,6 +700,28 @@
         }
 
         /* =====================================================
+           APPARITION AU SCROLL (reveal)
+        ===================================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+
+        /* =====================================================
            ACCESSIBILITÉ
         ===================================================== */
         @media (prefers-reduced-motion: reduce) {
@@ -780,7 +821,7 @@
     <div class="container">
 
         <!-- HERO -->
-        <div class="hero">
+        <div class="hero reveal">
             <span class="hero__small">CE QUE FAIT FRANA</span>
             <h1>Quatre fonctionnalités <span>pensées pour votre quotidien.</span></h1>
             <p>
@@ -794,7 +835,7 @@
              FONCTIONNALITÉ 1 — SUIVI QUOTIDIEN
         ===================================================== -->
         <section class="feature-block" id="suivi">
-            <div class="feature-block__image">
+            <div class="feature-block__image reveal">
                 <span class="feature-block__number">01</span>
                 <img src="{% static 'finances/img/suivi.jpg' %}"
                      alt="Suivi quotidien des finances Frana"
@@ -802,7 +843,7 @@
                      loading="lazy" decoding="async">
             </div>
 
-            <div class="feature-block__content">
+            <div class="feature-block__content reveal">
                 <div class="feature-block__icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -814,9 +855,9 @@
                 <span class="feature-block__small">SUIVI QUOTIDIEN</span>
                 <h2 class="feature-block__title">Enregistrez vos <span>transactions</span> au jour le jour.</h2>
                 <p class="feature-block__desc">
-                    Suivez vos entrées et sorties d'argent en un clin d'œil. Enregistrez
-                    manuellement chaque transaction — montant, catégorie, date et canal
-                    déclaratif — et consultez votre solde disponible en temps réel.
+                    Suivez vos <span class="hl">entrées et sorties d'argent</span> en un clin d'œil. Enregistrez
+                    manuellement chaque transaction — <span class="hl-soft">montant, catégorie, date et canal
+                    déclaratif</span> — et consultez votre <span class="hl">solde disponible en temps réel</span>.
                 </p>
 
                 <ul class="feature-list">
@@ -825,22 +866,22 @@
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Enregistrement manuel : montant, catégorie, date, canal déclaratif
+                        <span><span class="hl">Enregistrement manuel</span> : montant, catégorie, date, canal déclaratif</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Catégories contextualisées : loyer, transport, marché/nourriture,
-                        factures, scolarité, santé, transferts familiaux, tontine, culte, cérémonies
+                        <span><span class="hl">Catégories contextualisées</span> : loyer, transport, marché/nourriture,
+                        factures, scolarité, santé, transferts familiaux, tontine, culte, cérémonies</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Solde disponible calculé en temps réel
+                        <span><span class="hl">Solde disponible</span> calculé en temps réel</span>
                     </li>
                 </ul>
             </div>
@@ -850,7 +891,7 @@
              FONCTIONNALITÉ 2 — COMPTE À REBOURS
         ===================================================== -->
         <section class="feature-block feature-block--reverse" id="compte-a-rebours">
-            <div class="feature-block__image">
+            <div class="feature-block__image reveal">
                 <span class="feature-block__number">02</span>
                 <img src="{% static 'finances/img/Compte.jpg' %}"
                      alt="Compte à rebours avant la prochaine paie Frana"
@@ -858,7 +899,7 @@
                      loading="lazy" decoding="async">
             </div>
 
-            <div class="feature-block__content">
+            <div class="feature-block__content reveal">
                 <div class="feature-block__icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -870,9 +911,9 @@
                 <span class="feature-block__small">COMPTE À REBOURS</span>
                 <h2 class="feature-block__title">Combien de jours <span>avant la prochaine paie ?</span></h2>
                 <p class="feature-block__desc">
-                    Frana affiche en permanence le nombre de jours restants avant votre
-                    prochain revenu, et projette votre situation : « à ce rythme de dépense,
-                    vous serez à sec dans X jours ». Vous anticipez au lieu de subir.
+                    Frana affiche en permanence le <span class="hl">nombre de jours restants</span> avant votre
+                    prochain revenu, et projette votre situation : « <span class="hl-soft">à ce rythme de dépense,
+                    vous serez à sec dans X jours</span> ». Vous <span class="hl">anticipez</span> au lieu de subir.
                 </p>
 
                 <ul class="feature-list">
@@ -881,21 +922,21 @@
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Affichage « il vous reste X jours avant votre prochain revenu »
+                        <span><span class="hl">Affichage</span> « il vous reste X jours avant votre prochain revenu »</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Projection : « à ce rythme de dépense, vous serez à sec dans X jours »
+                        <span><span class="hl">Projection</span> : « à ce rythme de dépense, vous serez à sec dans X jours »</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Alerte si votre rythme de dépense met en danger la tenue jusqu'à la paie
+                        <span><span class="hl">Alerte</span> si votre rythme de dépense met en danger la tenue jusqu'à la paie</span>
                     </li>
                 </ul>
             </div>
@@ -905,7 +946,7 @@
              FONCTIONNALITÉ 3 — ÉPARGNE ET OBJECTIFS
         ===================================================== -->
         <section class="feature-block" id="epargne">
-            <div class="feature-block__image">
+            <div class="feature-block__image reveal">
                 <span class="feature-block__number">03</span>
                 <img src="{% static 'finances/img/Epargne.jpg' %}"
                      alt="Épargne et objectifs Frana"
@@ -913,7 +954,7 @@
                      loading="lazy" decoding="async">
             </div>
 
-            <div class="feature-block__content">
+            <div class="feature-block__content reveal">
                 <div class="feature-block__icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -926,9 +967,9 @@
                 <span class="feature-block__small">ÉPARGNE ET OBJECTIFS</span>
                 <h2 class="feature-block__title">Mettez de côté <span>pour vos projets concrets.</span></h2>
                 <p class="feature-block__desc">
-                    Fixez-vous un objectif précis — terrain, construction, dot, rentrée
+                    Fixez-vous un <span class="hl">objectif précis</span> — terrain, construction, dot, rentrée
                     scolaire, véhicule, pèlerinage — et suivez visuellement votre progression.
-                    La mise de côté se fait dès la réception du revenu : « payez-vous en premier ».
+                    La mise de côté se fait dès la réception du revenu : « <span class="hl-soft">payez-vous en premier</span> ».
                 </p>
 
                 <ul class="feature-list">
@@ -937,23 +978,23 @@
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Objectifs concrets : terrain, construction, dot, rentrée scolaire,
-                        véhicule, pèlerinage
+                        <span><span class="hl">Objectifs concrets</span> : terrain, construction, dot, rentrée scolaire,
+                        véhicule, pèlerinage</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Mise de côté automatique dès réception du revenu
-                        (mécanisme « payez-vous en premier »)
+                        <span><span class="hl">Mise de côté automatique</span> dès réception du revenu
+                        (mécanisme « payez-vous en premier »)</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Suivi visuel de la progression, objectif par objectif
+                        <span><span class="hl">Suivi visuel</span> de la progression, objectif par objectif</span>
                     </li>
                 </ul>
             </div>
@@ -963,7 +1004,7 @@
              FONCTIONNALITÉ 4 — DETTES ET CRÉDITS INFORMELS
         ===================================================== -->
         <section class="feature-block feature-block--reverse" id="dettes">
-            <div class="feature-block__image">
+            <div class="feature-block__image reveal">
                 <span class="feature-block__number">04</span>
                 <img src="{% static 'finances/img/Dettes.jpg' %}"
                      alt="Dettes et crédits informels Frana"
@@ -971,7 +1012,7 @@
                      loading="lazy" decoding="async">
             </div>
 
-            <div class="feature-block__content">
+            <div class="feature-block__content reveal">
                 <div class="feature-block__icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -983,8 +1024,8 @@
                 <h2 class="feature-block__title">Suivez <span>l'argent emprunté et prêté.</span></h2>
                 <p class="feature-block__desc">
                     Collègues, amis, boutiques à crédit — l'argent circule souvent de
-                    manière informelle. Frana vous aide à garder une trace claire des
-                    deux côtés : ce que vous devez, et ce qu'on vous doit.
+                    manière informelle. Frana vous aide à garder une <span class="hl">trace claire</span> des
+                    deux côtés : <span class="hl-soft">ce que vous devez</span>, et <span class="hl-soft">ce qu'on vous doit</span>.
                 </p>
 
                 <ul class="feature-list">
@@ -993,28 +1034,28 @@
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Suivi de l'argent emprunté et prêté (collègues, amis, boutiques à crédit)
+                        <span><span class="hl">Suivi</span> de l'argent emprunté et prêté (collègues, amis, boutiques à crédit)</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Rappels de remboursement dans les deux sens
+                        <span><span class="hl">Rappels de remboursement</span> dans les deux sens</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        Statut clair : en cours, soldé, en retard
+                        <span><span class="hl">Statut clair</span> : en cours, soldé, en retard</span>
                     </li>
                 </ul>
             </div>
         </section>
 
         <!-- CTA FINAL -->
-        <section class="cta">
+        <section class="cta reveal">
             <h2>Prêt à tester <span>ces fonctionnalités ?</span></h2>
             <p>
                 Essai complet de 30 jours — le temps d'un cycle de paie entier —
@@ -1043,6 +1084,53 @@
         </footer>
 
     </div>
+
+    <!-- APPARITION AU SCROLL (en cascade) -->
+    <script>
+        (function () {
+            var els = document.querySelectorAll('.reveal');
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* Pas d'animation : on affiche tout directement */
+            if (reduceMotion || !('IntersectionObserver' in window)) {
+                els.forEach(function (el) { el.classList.remove('reveal'); });
+                return;
+            }
+
+            var STEP = 120;      /* décalage entre deux éléments (ms) */
+            var MAX_STEPS = 5;   /* plafond pour éviter une attente trop longue */
+
+            var io = new IntersectionObserver(function (entries) {
+                /* Éléments qui deviennent visibles dans ce même lot,
+                   triés dans l'ordre du document */
+                var visibles = entries
+                    .filter(function (e) { return e.isIntersecting; })
+                    .map(function (e) { return e.target; })
+                    .sort(function (a, b) {
+                        return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+                    });
+
+                visibles.forEach(function (el, i) {
+                    io.unobserve(el);
+
+                    /* Délai en cascade */
+                    el.style.transitionDelay = (Math.min(i, MAX_STEPS) * STEP) + 'ms';
+                    el.classList.add('in');
+
+                    /* Fin de l'apparition : on retire classes et délai pour
+                       rendre la main aux styles d'origine */
+                    el.addEventListener('transitionend', function handler(ev) {
+                        if (ev.target !== el || ev.propertyName !== 'opacity') return;
+                        el.classList.remove('reveal', 'in');
+                        el.style.transitionDelay = '';
+                        el.removeEventListener('transitionend', handler);
+                    });
+                });
+            }, { threshold: 0.15 });
+
+            els.forEach(function (el) { io.observe(el); });
+        })();
+    </script>
 
 </body>
 </html>

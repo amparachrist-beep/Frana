@@ -958,6 +958,28 @@
         .footer strong { color: var(--gold); }
 
         /* =====================================================
+           APPARITION AU SCROLL (reveal)
+        ===================================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+
+        /* =====================================================
            RESPONSIVE — NAVBAR (aligné sur landing.html)
         ===================================================== */
         @media (max-width: 1000px) {
@@ -1041,7 +1063,7 @@
     <div class="container">
 
         <!-- HERO -->
-        <div class="about-hero">
+        <div class="about-hero reveal">
             <span class="about-hero__small">À PROPOS DE FRANA</span>
             <h1>Un SaaS de gestion financière <span>pensé pour l'Afrique.</span></h1>
             <p>
@@ -1053,7 +1075,7 @@
 
         <!-- MISSION -->
         <section class="section">
-            <div class="card">
+            <div class="card reveal">
                 <div class="section__head">
                     <small>NOTRE MISSION</small>
                     <h2>Rendre la gestion financière <span>simple, concrète et accessible.</span></h2>
@@ -1083,7 +1105,7 @@
 
         <!-- POURQUOI L'AFRIQUE -->
         <section class="section">
-            <div class="africa-card">
+            <div class="africa-card reveal">
                 <div class="africa-card__icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1112,14 +1134,14 @@
 
         <!-- PERSONA -->
         <section class="section">
-            <div class="section__head">
+            <div class="section__head reveal">
                 <small>POUR QUI ?</small>
                 <h2>Pensé pour les <span>revenus réguliers.</span></h2>
             </div>
 
             <div class="persona-grid">
 
-                <div class="persona">
+                <div class="persona reveal">
                     <div class="persona__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1131,7 +1153,7 @@
                     <div class="persona__desc">Revenu mensuel fiable, source unique.</div>
                 </div>
 
-                <div class="persona">
+                <div class="persona reveal">
                     <div class="persona__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1143,7 +1165,7 @@
                     <div class="persona__desc">Plusieurs sources possibles, léger risque de retard.</div>
                 </div>
 
-                <div class="persona">
+                <div class="persona reveal">
                     <div class="persona__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1155,7 +1177,7 @@
                     <div class="persona__desc">Source unique, très stable.</div>
                 </div>
 
-                <div class="persona">
+                <div class="persona reveal">
                     <div class="persona__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1167,7 +1189,7 @@
                     <div class="persona__desc">Une source par bien loué, risque de retard locataire.</div>
                 </div>
 
-                <div class="persona">
+                <div class="persona reveal">
                     <div class="persona__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1184,14 +1206,14 @@
 
         <!-- CAS D'USAGE -->
         <section class="section">
-            <div class="section__head">
+            <div class="section__head reveal">
                 <small>CE QUE FAIT FRANA</small>
                 <h2>Quatre <span>cas d'usage prioritaires.</span></h2>
             </div>
 
             <div class="features-grid">
 
-                <div class="feature">
+                <div class="feature reveal">
                     <div class="feature__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1206,7 +1228,7 @@
                     </div>
                 </div>
 
-                <div class="feature">
+                <div class="feature reveal">
                     <div class="feature__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1221,7 +1243,7 @@
                     </div>
                 </div>
 
-                <div class="feature">
+                <div class="feature reveal">
                     <div class="feature__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1237,7 +1259,7 @@
                     </div>
                 </div>
 
-                <div class="feature">
+                <div class="feature reveal">
                     <div class="feature__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1256,14 +1278,14 @@
 
         <!-- VALEURS -->
         <section class="section">
-            <div class="section__head">
+            <div class="section__head reveal">
                 <small>NOS PRINCIPES</small>
                 <h2>Trois valeurs <span>qui guident Frana.</span></h2>
             </div>
 
             <div class="values-grid">
 
-                <div class="value">
+                <div class="value reveal">
                     <div class="value__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1277,7 +1299,7 @@
                     </div>
                 </div>
 
-                <div class="value">
+                <div class="value reveal">
                     <div class="value__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1291,7 +1313,7 @@
                     </div>
                 </div>
 
-                <div class="value">
+                <div class="value reveal">
                     <div class="value__icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1311,12 +1333,12 @@
 
         <!-- FONDATEUR -->
         <section class="section">
-            <div class="section__head">
+            <div class="section__head reveal">
                 <small>DERRIÈRE FRANA</small>
                 <h2>Un projet porté par <span>un ingénieur logiciel.</span></h2>
             </div>
 
-            <div class="founder">
+            <div class="founder reveal">
                 <div class="founder__photo">
                     <img src="{% static 'finances/img/franck.jpg' %}"
                          alt="Nkou-Ampa Franck Emmanuel">
@@ -1351,7 +1373,7 @@
 
         <!-- CTA -->
         <section class="section">
-            <div class="cta">
+            <div class="cta reveal">
                 <h2>Prêt à reprendre le contrôle <span>de vos finances ?</span></h2>
                 <p>
                     Essai complet de 30 jours — le temps d'un cycle de paie entier —
@@ -1382,6 +1404,54 @@
         </footer>
 
     </div>
+
+    <!-- APPARITION AU SCROLL -->
+       <!-- APPARITION AU SCROLL (en cascade) -->
+    <script>
+        (function () {
+            var els = document.querySelectorAll('.reveal');
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* Pas d'animation : on affiche tout directement */
+            if (reduceMotion || !('IntersectionObserver' in window)) {
+                els.forEach(function (el) { el.classList.remove('reveal'); });
+                return;
+            }
+
+            var STEP = 120;      /* décalage entre deux cartes (ms) */
+            var MAX_STEPS = 5;   /* plafond pour éviter une attente trop longue */
+
+            var io = new IntersectionObserver(function (entries) {
+                /* Éléments qui deviennent visibles dans ce même lot,
+                   triés dans l'ordre du document */
+                var visibles = entries
+                    .filter(function (e) { return e.isIntersecting; })
+                    .map(function (e) { return e.target; })
+                    .sort(function (a, b) {
+                        return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+                    });
+
+                visibles.forEach(function (el, i) {
+                    io.unobserve(el);
+
+                    /* Délai en cascade */
+                    el.style.transitionDelay = (Math.min(i, MAX_STEPS) * STEP) + 'ms';
+                    el.classList.add('in');
+
+                    /* Fin de l'apparition : on retire classes et délai pour
+                       rendre la main aux transitions/hover d'origine */
+                    el.addEventListener('transitionend', function handler(ev) {
+                        if (ev.target !== el || ev.propertyName !== 'opacity') return;
+                        el.classList.remove('reveal', 'in');
+                        el.style.transitionDelay = '';
+                        el.removeEventListener('transitionend', handler);
+                    });
+                });
+            }, { threshold: 0.15 });
+
+            els.forEach(function (el) { io.observe(el); });
+        })();
+    </script>
 
 </body>
 </html>

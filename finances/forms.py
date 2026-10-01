@@ -16,7 +16,23 @@ from django.db import models
 # =========================================================
 # AUTHENTIFICATION
 # =========================================================
+INDICATIFS = [
+    ("+242", "Congo Brazzaville"),
+    ("+226", "Burkina Faso"),
+    ("+241", "Gabon"),
+    ("+223", "Mali"),
+    ("+221", "Sénégal"),
+    ("+228", "Togo"),
+]
+
+
 class InscriptionForm(UserCreationForm):
+    indicatif = forms.ChoiceField(
+        choices=INDICATIFS,
+        initial="+242",
+        widget=forms.HiddenInput(),
+    )
+
     class Meta:
         model = Utilisateur
         fields = [
@@ -32,7 +48,7 @@ class InscriptionForm(UserCreationForm):
             "telephone": forms.TextInput(attrs={
                 "class": "login__input",
                 "placeholder": " ",
-                "autocomplete": "tel",
+                "autocomplete": "tel-national",
             }),
             "email": forms.EmailInput(attrs={
                 "class": "login__input",
@@ -69,9 +85,29 @@ class InscriptionForm(UserCreationForm):
             "autocomplete": "new-password",
         })
 
+    def clean(self):
+        cleaned = super().clean()
+        numero = (cleaned.get("telephone") or "").strip()
+        indicatif = cleaned.get("indicatif") or "+242"
+        if numero:
+            # Retire espaces, points et tirets
+            numero = "".join(c for c in numero if c.isdigit() or c == "+")
+            if not numero.startswith("+"):
+                chiffres_indicatif = indicatif.lstrip("+")  # "+242" -> "242"
+                # Si la saisie commence déjà par l'indicatif (sans le "+"),
+                # on le retire pour ne pas le doubler. La garde sur la longueur
+                # évite d'amputer un vrai numéro local qui commencerait par les
+                # mêmes chiffres.
+                if (
+                    numero.startswith(chiffres_indicatif)
+                    and len(numero) - len(chiffres_indicatif) >= 8
+                ):
+                    numero = numero[len(chiffres_indicatif):]
+                numero = f"{indicatif}{numero}"
+            cleaned["telephone"] = numero
+        return cleaned
+
     def save(self, commit=True):
-        from datetime import timedelta
-        from django.utils import timezone
         user = super().save(commit=False)
         user.date_fin_essai = timezone.now().date() + timedelta(days=30)
         user.statut_abonnement = Utilisateur.Abonnement.ESSAI
@@ -103,11 +139,32 @@ class ConnexionForm(forms.Form):
         telephone = cleaned.get("telephone")
         password = cleaned.get("password")
         if telephone and password:
-            user = authenticate(telephone=telephone, password=password)
+            saisie = telephone.strip()
+            # Retire espaces, points et tirets
+            numero = "".join(c for c in saisie if c.isdigit() or c == "+")
+
+            # Numéros candidats : tel que saisi, avec "+", ou avec chaque indicatif
+            candidats = {saisie, numero}
+            if not numero.startswith("+"):
+                candidats.add("+" + numero)
+                candidats.update(f"{code}{numero}" for code, _ in INDICATIFS)
+
+            # On ne teste le mot de passe que sur les comptes qui existent
+            existants = Utilisateur.objects.filter(
+                telephone__in=candidats
+            ).values_list("telephone", flat=True)
+
+            user = None
+            for tel in existants:
+                user = authenticate(telephone=tel, password=password)
+                if user:
+                    break
+
             if not user:
                 raise forms.ValidationError("Téléphone ou mot de passe incorrect.")
             cleaned["user"] = user
         return cleaned
+
 
 # =========================================================
 # SOURCES DE REVENU
@@ -115,7 +172,7 @@ class ConnexionForm(forms.Form):
 class SourceRevenuForm(forms.ModelForm):
     class Meta:
         model = SourceRevenu
-        exclude = ["utilisateur", "actif"]   # ← ajouter "actif"
+        exclude = ["utilisateur", "actif"]
 
 
 # =========================================================
@@ -136,13 +193,35 @@ class CategorieForm(forms.ModelForm):
 
 
 # =========================================================
+# WIDGET : ajoute data-type="revenu|depense" sur chaque <option>
+# (doit être défini AVANT TransactionForm)
+# =========================================================
+class CategorieSelect(forms.Select):
+    def create_option(
+        self, name, value, label, selected, index, subindex=None, attrs=None
+    ):
+        option = super().create_option(
+            name, value, label, selected, index, subindex=subindex, attrs=attrs
+        )
+        # `value` est un ModelChoiceIteratorValue (Django >= 3.1) ;
+        # l'option vide ("---------") est une simple chaîne, sans .instance
+        instance = getattr(value, "instance", None)
+        if instance is not None:
+            option["attrs"]["data-type"] = instance.type
+        return option
+
+
+# =========================================================
 # TRANSACTIONS
 # =========================================================
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         exclude = ["utilisateur", "cree_le"]
-        widgets = {"date": forms.DateInput(attrs={"type": "date"})}
+        widgets = {
+            "date": forms.DateInput(attrs={"type": "date"}),
+            "categorie": CategorieSelect(),
+        }
 
     def __init__(self, *args, utilisateur=None, **kwargs):
         super().__init__(*args, **kwargs)
