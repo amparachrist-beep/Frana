@@ -11,14 +11,14 @@ urlpatterns = [
     # ---------- DASHBOARD ----------
     path("dashboard/", views.dashboard, name="dashboard"),
 
-    # ---------- TRANSACTIONS ----------
-    path("transactions/", views.transactions, name="transactions"),
-    path("transactions/nouvelle/", views.transaction_create, name="transaction_create"),
+    # ---------- REVENUS ----------
+    path("revenus/", views.revenus, name="revenus"),
+    path("revenus/nouveau/", views.revenu_create, name="revenu_create"),
+    path("revenus/<uuid:pk>/confirmer/", views.revenu_confirmer, name="revenu_confirmer"),
 
-    # ---------- SOURCES DE REVENU ----------
-    path("revenus/", views.sources, name="sources"),
-    path("revenus/nouveau/", views.source_create, name="source_create"),
-    path("revenus/<uuid:pk>/supprimer/", views.source_delete, name="source_delete"),
+    # ---------- DÉPENSES ----------
+    path("depenses/", views.depenses, name="depenses"),
+    path("depenses/nouvelle/", views.depense_create, name="depense_create"),
 
     # ---------- CATÉGORIES ----------
     path("categories/", views.categories, name="categories"),

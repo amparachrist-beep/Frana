@@ -12,12 +12,12 @@ from django.views.decorators.http import require_POST
 from feedback.models import FeatureUsage
 
 from .forms import (
-    ConnexionForm, InscriptionForm, SourceRevenuForm, TransactionForm,
+    ConnexionForm, InscriptionForm, RevenuForm, DepenseForm,
     ObjectifForm, ContributionForm, DetteForm, RemboursementForm,
     CategorieForm,
 )
 from .models import (
-    Categorie, Transaction, SourceRevenu, ObjectifEpargne,
+    Categorie, Transaction, ObjectifEpargne,
     ContributionEpargne, Dette, RemboursementDette,
 )
 
@@ -113,12 +113,15 @@ def dashboard(request):
 
     FeatureUsage.incrementer(user, "compte_a_rebours")  # ligne ajoutée
 
-    transactions = user.transactions.select_related("categorie")[:8]
+    # Seules les transactions reçues comptent dans le solde et les statistiques
+    recues = user.transactions.filter(statut="recue")
 
-    revenus = user.transactions.filter(type="revenu").aggregate(
+    transactions = recues.select_related("categorie")[:8]
+
+    revenus = recues.filter(type="revenu").aggregate(
         total=Sum("montant")
     )["total"] or Decimal("0")
-    depenses = user.transactions.filter(type="depense").aggregate(
+    depenses = recues.filter(type="depense").aggregate(
         total=Sum("montant")
     )["total"] or Decimal("0")
     solde = revenus - depenses  # calculé une seule fois
@@ -129,15 +132,23 @@ def dashboard(request):
 
     # Projection basée sur les 30 derniers jours
     debut = date.today() - timedelta(days=30)
-    depenses_30j = user.transactions.filter(
+    depenses_30j = recues.filter(
         type="depense", date__gte=debut
     ).aggregate(total=Sum("montant"))["total"] or Decimal("0")
-    nb_transactions_30j = user.transactions.filter(date__gte=debut).count()
+    nb_transactions_30j = recues.filter(date__gte=debut).count()
     moyenne_jour = depenses_30j / Decimal("30")
 
     projection = None
     if moyenne_jour > 0 and nb_transactions_30j >= 5:
         projection = solde / moyenne_jour
+
+    # Revenus prévus : à confirmer (échéance atteinte) et à venir
+    revenus_a_confirmer = user.transactions.filter(
+        type="revenu", statut="prevue", date__lte=date.today()
+    ).select_related("categorie")
+    revenus_prevus = user.transactions.filter(
+        type="revenu", statut="prevue", date__gt=date.today()
+    ).select_related("categorie").order_by("date")[:3]
 
     context = {
         "transactions": transactions,
@@ -148,82 +159,86 @@ def dashboard(request):
         "jours_paie": jours_paie,
         "prochaine_paie": prochain,
         "projection_jours": round(float(projection), 1) if projection is not None else None,
+        "revenus_a_confirmer": revenus_a_confirmer,
+        "revenus_prevus": revenus_prevus,
         "page_active": "dashboard",
     }
     return render(request, "finances/dashboard.html", context)
 
 
 # =========================================================
-# TRANSACTIONS — §2.1 du PDF
+# REVENUS (reçus et prévus) — §2.1, §4.2 du PDF
 # =========================================================
 @login_required
-def transactions(request):
-    qs = request.user.transactions.select_related("categorie", "source_revenu")
-    type_filter = request.GET.get("type")
-    if type_filter in ("revenu", "depense"):
-        qs = qs.filter(type=type_filter)
-    return render(request, "finances/transactions.html", {
-        "transactions": qs,
-        "page_active": "transactions",
+def revenus(request):
+    qs = request.user.transactions.filter(type="revenu").select_related("categorie")
+    prevus = qs.filter(statut="prevue").order_by("date")
+    return render(request, "finances/revenus.html", {
+        "recus": qs.filter(statut="recue"),
+        "prevus": prevus,
+        "total_prevu": prevus.aggregate(total=Sum("montant"))["total"] or Decimal("0"),
+        "aujourdhui": date.today(),
+        "page_active": "revenus",
     })
 
 
 @login_required
-def transaction_create(request):
-    # utilisateur passé au formulaire : filtrage auto des querysets + injection au save
-    form = TransactionForm(request.POST or None, utilisateur=request.user)
+def revenu_create(request):
+    form = RevenuForm(request.POST or None, utilisateur=request.user)
+    if request.method == "POST" and form.is_valid():
+        obj = form.save()
+        FeatureUsage.incrementer(request.user, "transactions")  # ligne ajoutée
+        messages.success(
+            request,
+            "Revenu prévu enregistré." if obj.statut == "prevue" else "Revenu enregistré.",
+        )
+        return redirect("revenus")
+    return render(request, "finances/revenu_form.html", {
+        "form": form,
+        "page_active": "revenus",
+    })
+
+
+@login_required
+@require_POST
+def revenu_confirmer(request, pk):
+    """Transforme un revenu prévu en revenu réellement reçu."""
+    transaction = get_object_or_404(
+        Transaction, pk=pk, utilisateur=request.user,
+        type="revenu", statut="prevue",
+    )
+    transaction.statut = Transaction.Statut.RECUE
+    if transaction.date > date.today():
+        transaction.date = date.today()
+    transaction.save()
+    messages.success(request, "Revenu confirmé, votre solde est à jour.")
+    return redirect("revenus")
+
+
+# =========================================================
+# DÉPENSES — §2.1 du PDF
+# =========================================================
+@login_required
+def depenses(request):
+    return render(request, "finances/depenses.html", {
+        "depenses": request.user.transactions.filter(
+            type="depense"
+        ).select_related("categorie"),
+        "page_active": "depenses",
+    })
+
+
+@login_required
+def depense_create(request):
+    form = DepenseForm(request.POST or None, utilisateur=request.user)
     if request.method == "POST" and form.is_valid():
         form.save()
         FeatureUsage.incrementer(request.user, "transactions")  # ligne ajoutée
-        messages.success(request, "Transaction enregistrée.")
-        return redirect("transactions")
-    return render(request, "finances/transaction_form.html", {
+        messages.success(request, "Dépense enregistrée.")
+        return redirect("depenses")
+    return render(request, "finances/depense_form.html", {
         "form": form,
-        "titre": "Nouvelle",
-        "page_active": "transactions",
-    })
-
-
-# =========================================================
-# SOURCES DE REVENU — §4.2 du PDF
-# =========================================================
-@login_required
-def sources(request):
-    return render(request, "finances/sources.html", {
-        "sources": request.user.sources_revenu.filter(actif=True),
-        "page_active": "sources",
-    })
-
-
-@login_required
-def source_create(request):
-    form = SourceRevenuForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        obj = form.save(commit=False)
-        obj.utilisateur = request.user
-        obj.save()
-        messages.success(request, "Source de revenu ajoutée.")
-        return redirect("sources")
-    return render(request, "finances/source_form.html", {
-        "form": form,
-        "titre": "Nouvelle",
-        "page_active": "sources",
-    })
-
-
-@login_required
-def source_delete(request, pk):
-    source = get_object_or_404(SourceRevenu, pk=pk, utilisateur=request.user)
-
-    if request.method == "POST":
-        source.actif = False
-        source.save(update_fields=["actif"])
-        messages.success(request, "Source désactivée.")
-        return redirect("sources")
-
-    return render(request, "finances/source_confirm_delete.html", {
-        "source": source,
-        "page_active": "sources",
+        "page_active": "depenses",
     })
 
 

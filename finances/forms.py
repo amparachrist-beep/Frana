@@ -193,74 +193,67 @@ class CategorieForm(forms.ModelForm):
 
 
 # =========================================================
-# WIDGET : ajoute data-type="revenu|depense" sur chaque <option>
-# (doit être défini AVANT TransactionForm)
+# TRANSACTIONS — formulaires séparés Revenu / Dépense
 # =========================================================
-class CategorieSelect(forms.Select):
-    def create_option(
-        self, name, value, label, selected, index, subindex=None, attrs=None
-    ):
-        option = super().create_option(
-            name, value, label, selected, index, subindex=subindex, attrs=attrs
-        )
-        # `value` est un ModelChoiceIteratorValue (Django >= 3.1) ;
-        # l'option vide ("---------") est une simple chaîne, sans .instance
-        instance = getattr(value, "instance", None)
-        if instance is not None:
-            option["attrs"]["data-type"] = instance.type
-        return option
-
-
-# =========================================================
-# TRANSACTIONS
-# =========================================================
-class TransactionForm(forms.ModelForm):
-    class Meta:
-        model = Transaction
-        exclude = ["utilisateur", "cree_le"]
-        widgets = {
-            "date": forms.DateInput(attrs={"type": "date"}),
-            "categorie": CategorieSelect(),
-        }
+class _TransactionBaseForm(forms.ModelForm):
+    TYPE = None  # défini dans les sous-classes
 
     def __init__(self, *args, utilisateur=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.utilisateur = utilisateur
-        if utilisateur:
-            # Catégories système + celles de l'utilisateur
-            self.fields["categorie"].queryset = Categorie.objects.filter(
-                models.Q(utilisateur__isnull=True) | models.Q(utilisateur=utilisateur)
-            )
-            # Sources de revenu de l'utilisateur uniquement
-            self.fields["source_revenu"].queryset = SourceRevenu.objects.filter(
-                utilisateur=utilisateur, actif=True
-            )
-        # Rendre source_revenu optionnel
-        self.fields["source_revenu"].required = False
-
-    def clean(self):
-        cleaned = super().clean()
-        categorie = cleaned.get("categorie")
-        type_ = cleaned.get("type")
-        source = cleaned.get("source_revenu")
-
-        if categorie and type_ and categorie.type != type_:
-            raise forms.ValidationError(
-                "Le type sélectionné ne correspond pas à la catégorie choisie."
-            )
-        if source and type_ and type_ != Transaction.Type.REVENU:
-            raise forms.ValidationError(
-                "Une source de revenu ne peut être liée qu'à un revenu."
-            )
-        return cleaned
+        # Le type est fixé d'avance : Transaction.clean() vérifie
+        # ainsi la cohérence avec la catégorie choisie
+        self.instance.type = self.TYPE
+        # Catégories système + celles de l'utilisateur, du bon type uniquement
+        self.fields["categorie"].queryset = Categorie.objects.filter(
+            models.Q(utilisateur__isnull=True) | models.Q(utilisateur=utilisateur),
+            type=self.TYPE,
+        )
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        if self.utilisateur:
-            instance.utilisateur = self.utilisateur
+        instance.utilisateur = self.utilisateur
+        instance.type = self.TYPE
         if commit:
             instance.save()
         return instance
+
+
+class RevenuForm(_TransactionBaseForm):
+    TYPE = Transaction.Type.REVENU
+
+    class Meta:
+        model = Transaction
+        fields = ["montant", "categorie", "note", "date", "source_revenu"]
+        widgets = {"date": forms.DateInput(attrs={"type": "date"})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Sources de revenu de l'utilisateur uniquement, champ optionnel
+        self.fields["source_revenu"].queryset = SourceRevenu.objects.filter(
+            utilisateur=self.utilisateur, actif=True
+        )
+        self.fields["source_revenu"].required = False
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Date future => revenu prévu (exclu du solde) ; sinon revenu reçu
+        if instance.date > timezone.localdate():
+            instance.statut = Transaction.Statut.PREVUE
+        else:
+            instance.statut = Transaction.Statut.RECUE
+        if commit:
+            instance.save()
+        return instance
+
+
+class DepenseForm(_TransactionBaseForm):
+    TYPE = Transaction.Type.DEPENSE
+
+    class Meta:
+        model = Transaction
+        fields = ["montant", "categorie", "note", "date", "canal_declaratif"]
+        widgets = {"date": forms.DateInput(attrs={"type": "date"})}
 
 
 # =========================================================

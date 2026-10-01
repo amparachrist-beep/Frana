@@ -1,0 +1,331 @@
+{% extends "finances/base.html" %}
+{% load static %}
+
+{% block title %}Frana — Dépenses{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        color-scheme: dark;
+        --body-font: "Poppins", "Times New Roman", serif;
+        --brown-deep: #1e140d;
+        --brown-dark: #302016;
+        --brown: #5b3c22;
+        --brown-light: #8b6235;
+        --gold: #d9ad55;
+        --gold-light: #f0ce82;
+        --cream: #f1e7d7;
+        --cream-light: #fffaf2;
+        --text-main: #fffaf2;
+        --text-muted: #d8cbbb;
+        --card-bg: rgba(30, 20, 13, 0.72);
+        --card-border: rgba(217, 173, 85, 0.28);
+    }
+
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: var(--body-font);
+    }
+
+    body {
+        min-height: 100vh;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(20, 13, 8, 0.55) 0%,
+                rgba(20, 13, 8, 0.72) 45%,
+                rgba(20, 13, 8, 0.92) 100%
+            ),
+            url("{% static 'finances/img/pexels-pavel-danilyuk-7654180.jpg' %}")
+            center / cover no-repeat fixed;
+        background-attachment: fixed;
+        color: var(--text-main);
+    }
+
+    a { text-decoration: none; }
+
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 130px 30px 60px;
+    }
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .page-header__small {
+        display: inline-block;
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        margin-bottom: 12px;
+    }
+
+    .page-header h1 {
+        font-size: clamp(28px, 3vw, 40px);
+        font-weight: 700;
+        color: var(--cream-light);
+        margin-bottom: 8px;
+        line-height: 1.15;
+    }
+
+    .page-header h1 span { color: var(--gold); }
+
+    .page-header p {
+        color: var(--text-muted);
+        font-size: 15px;
+        font-family: Arial, sans-serif;
+        max-width: 560px;
+    }
+
+    /* =====================================================
+       ALERTES
+    ===================================================== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 10px;
+        margin-bottom: 22px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    .alert--success {
+        background: rgba(80, 180, 100, 0.15);
+        border: 1px solid rgba(100, 220, 120, 0.4);
+        color: #d4ffdd;
+    }
+
+    .alert--error {
+        background: rgba(191, 60, 60, 0.15);
+        border: 1px solid rgba(230, 100, 100, 0.4);
+        color: #ffd4d4;
+    }
+
+    /* =====================================================
+       PANEL
+    ===================================================== */
+    .panel {
+        background: linear-gradient(145deg, rgba(48, 32, 22, 0.82), rgba(25, 17, 11, 0.78));
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 24px 26px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .panel__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .panel__title {
+        color: var(--cream-light);
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    /* =====================================================
+       LISTE
+    ===================================================== */
+    .tx-list { list-style: none; display: grid; gap: 10px; }
+
+    .tx {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(217, 173, 85, 0.10);
+        transition: background 0.3s, border-color 0.3s;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .tx:hover {
+        background: rgba(217, 173, 85, 0.07);
+        border-color: rgba(217, 173, 85, 0.28);
+    }
+
+    .tx__left {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .tx__cat { color: var(--cream-light); font-weight: 600; font-size: 14px; }
+
+    .tx__date {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+    }
+
+    .tx__note {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+        font-style: italic;
+        margin-top: 2px;
+    }
+
+    .tx__right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .tx__amount {
+        font-weight: 700;
+        font-size: 15px;
+        font-family: Arial, sans-serif;
+        white-space: nowrap;
+        color: #ff8c8c;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        font-family: Arial, sans-serif;
+        text-transform: uppercase;
+        background: rgba(255, 140, 140, 0.12);
+        color: #ff8c8c;
+        border: 1px solid rgba(255, 140, 140, 0.4);
+    }
+
+    .tx-empty {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 22px 0;
+    }
+
+    /* =====================================================
+       BOUTONS
+    ===================================================== */
+    .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 46px;
+        padding: 0 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn--primary {
+        color: #24170d;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        box-shadow: 0 6px 20px rgba(191, 140, 55, 0.35);
+    }
+
+    .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(191, 140, 55, 0.55);
+        filter: brightness(1.06);
+    }
+
+    @media (max-width: 750px) {
+        .container { padding: 90px 20px 90px; }
+        .page-header { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <span class="page-header__small">DÉPENSES</span>
+            <h1>Toutes mes <span>dépenses</span></h1>
+            <p>Enregistrez ici tout ce que vous dépensez. Les dépenses sont toujours considérées comme reçues et impactent immédiatement votre solde.</p>
+        </div>
+        <div class="cta-row">
+            <a href="{% url 'depense_create' %}" class="btn btn--primary">+ Ajouter une dépense</a>
+        </div>
+    </div>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert--{{ message.tags|default:'success' }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- LISTE -->
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">Historique des dépenses</h2>
+        </div>
+
+        {% if depenses %}
+            <ul class="tx-list">
+                {% for t in depenses %}
+                    <li class="tx">
+                        <div class="tx__left">
+                            <span class="tx__cat">{{ t.categorie.nom }}</span>
+                            <span class="tx__date">{{ t.date|date:"d M Y" }} · {{ t.get_canal_declaratif_display }}</span>
+                            {% if t.note %}<span class="tx__note">{{ t.note }}</span>{% endif %}
+                        </div>
+                        <div class="tx__right">
+                            <span class="badge">Dépense</span>
+                            <span class="tx__amount">
+                                − {{ t.montant|floatformat:0 }} {{ request.user.devise }}
+                            </span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="tx-empty">Aucune dépense enregistrée pour le moment.</p>
+            <div class="cta-row" style="justify-content:center; margin-top: 12px;">
+                <a href="{% url 'depense_create' %}" class="btn btn--primary">+ Ajouter une dépense</a>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

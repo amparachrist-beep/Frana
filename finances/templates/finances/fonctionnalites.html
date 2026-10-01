@@ -826,19 +826,20 @@
             <h1>Quatre fonctionnalités <span>pensées pour votre quotidien.</span></h1>
             <p>
                 Frana s'articule autour de quatre cas d'usage concrets, partageant tous
-                le même socle technique : transaction, catégorie, date. Une base simple
+                le même socle technique : <span class="hl-soft">revenu</span> ou
+                <span class="hl-soft">dépense</span>, catégorie, date. Une base simple
                 et solide pour gérer votre argent sans complexité.
             </p>
         </div>
 
         <!-- =====================================================
-             FONCTIONNALITÉ 1 — SUIVI QUOTIDIEN
+             FONCTIONNALITÉ 1 — REVENUS & DÉPENSES
         ===================================================== -->
         <section class="feature-block" id="suivi">
             <div class="feature-block__image reveal">
                 <span class="feature-block__number">01</span>
                 <img src="{% static 'finances/img/suivi.jpg' %}"
-                     alt="Suivi quotidien des finances Frana"
+                     alt="Suivi quotidien des revenus et dépenses Frana"
                      width="1200" height="900"
                      loading="lazy" decoding="async">
             </div>
@@ -852,12 +853,12 @@
                     </svg>
                 </div>
 
-                <span class="feature-block__small">SUIVI QUOTIDIEN</span>
-                <h2 class="feature-block__title">Enregistrez vos <span>transactions</span> au jour le jour.</h2>
+                <span class="feature-block__small">REVENUS &amp; DÉPENSES</span>
+                <h2 class="feature-block__title">Enregistrez ce que vous <span>gagnez</span> et ce que vous <span>dépensez</span>.</h2>
                 <p class="feature-block__desc">
-                    Suivez vos <span class="hl">entrées et sorties d'argent</span> en un clin d'œil. Enregistrez
-                    manuellement chaque transaction — <span class="hl-soft">montant, catégorie, date et canal
-                    déclaratif</span> — et consultez votre <span class="hl">solde disponible en temps réel</span>.
+                    Dans <span class="hl">Revenus</span>, j'enregistre ce que je gagne ou ce que je vais recevoir.
+                    Dans <span class="hl">Dépenses</span>, j'enregistre ce que je dépense. Deux sections
+                    distinctes, un seul <span class="hl">solde disponible</span> calculé en temps réel.
                 </p>
 
                 <ul class="feature-list">
@@ -866,22 +867,24 @@
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        <span><span class="hl">Enregistrement manuel</span> : montant, catégorie, date, canal déclaratif</span>
+                        <span><span class="hl">Revenus</span> : ce que je gagne, ou ce que je vais recevoir
+                        (date future = revenu prévu, à confirmer à l'échéance)</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        <span><span class="hl">Catégories contextualisées</span> : loyer, transport, marché/nourriture,
-                        factures, scolarité, santé, transferts familiaux, tontine, culte, cérémonies</span>
+                        <span><span class="hl">Dépenses</span> : ce que je dépense — montant, catégorie, date,
+                        canal de paiement</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
-                        <span><span class="hl">Solde disponible</span> calculé en temps réel</span>
+                        <span><span class="hl">Solde disponible</span> calculé en temps réel, hors revenus prévus
+                        non encore confirmés</span>
                     </li>
                 </ul>
             </div>

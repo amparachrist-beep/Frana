@@ -127,6 +127,25 @@
             gap: 10px;
         }
 
+        /* =====================================================
+           PASTILLE DE NOTIFICATION — revenus à confirmer
+        ===================================================== */
+        .badge-notif {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            margin-left: 6px;
+            border-radius: 9px;
+            background: #e5484d;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
         /* BOTTOM NAV (mobile) — cachée par défaut */
         .bottom-nav { display: none; }
 
@@ -222,6 +241,14 @@
             }
 
             .bottom-nav__item:active { transform: scale(0.94); }
+
+            /* Pastille positionnée en haut à droite de l'icône */
+            .bottom-nav__item .badge-notif {
+                position: absolute;
+                top: 6px;
+                left: calc(50% + 6px);
+                margin: 0;
+            }
         }
     </style>
 
@@ -241,11 +268,13 @@
             <li class="{% if page_active == 'dashboard' %}active{% endif %}">
                 <a href="{% url 'dashboard' %}">Tableau de bord</a>
             </li>
-            <li class="{% if page_active == 'transactions' %}active{% endif %}">
-                <a href="{% url 'transactions' %}">Transactions</a>
+            <li class="{% if page_active == 'revenus' %}active{% endif %}">
+                <a href="{% url 'revenus' %}">Revenus
+                    {% if nb_revenus_a_confirmer %}<span class="badge-notif">{{ nb_revenus_a_confirmer }}</span>{% endif %}
+                </a>
             </li>
-            <li class="{% if page_active == 'sources' %}active{% endif %}">
-                <a href="{% url 'sources' %}">Revenus</a>
+            <li class="{% if page_active == 'depenses' %}active{% endif %}">
+                <a href="{% url 'depenses' %}">Dépenses</a>
             </li>
             <li class="{% if page_active == 'objectifs' %}active{% endif %}">
                 <a href="{% url 'objectifs' %}">Objectifs</a>
@@ -291,23 +320,23 @@
             Accueil
         </a>
 
-        <a href="{% url 'transactions' %}"
-           class="bottom-nav__item {% if page_active == 'transactions' %}active{% endif %}">
+        <a href="{% url 'revenus' %}"
+           class="bottom-nav__item {% if page_active == 'revenus' %}active{% endif %}">
+            {% if nb_revenus_a_confirmer %}<span class="badge-notif">{{ nb_revenus_a_confirmer }}</span>{% endif %}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3v18h18"/>
-                <path d="M7 14l4-4 4 4 5-5"/>
-            </svg>
-            Trans.
-        </a>
-
-        <a href="{% url 'sources' %}"
-           class="bottom-nav__item {% if page_active == 'sources' %}active{% endif %}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                <path d="M12 19V5M5 12l7-7 7 7"/>
             </svg>
             Revenus
+        </a>
+
+        <a href="{% url 'depenses' %}"
+           class="bottom-nav__item {% if page_active == 'depenses' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+            Dépenses
         </a>
 
         <a href="{% url 'objectifs' %}"

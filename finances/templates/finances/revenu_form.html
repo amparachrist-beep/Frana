@@ -1,0 +1,333 @@
+{% extends "finances/base.html" %}
+{% load static %}
+
+{% block title %}Frana — Nouveau revenu{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        color-scheme: dark;
+        --body-font: "Poppins", "Times New Roman", serif;
+        --brown-deep: #1e140d;
+        --brown-dark: #302016;
+        --brown: #5b3c22;
+        --brown-light: #8b6235;
+        --gold: #d9ad55;
+        --gold-light: #f0ce82;
+        --cream: #f1e7d7;
+        --cream-light: #fffaf2;
+        --text-main: #fffaf2;
+        --text-muted: #d8cbbb;
+        --card-bg: rgba(30, 20, 13, 0.72);
+        --card-border: rgba(217, 173, 85, 0.28);
+    }
+
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: var(--body-font);
+    }
+
+    body {
+        min-height: 100vh;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(20, 13, 8, 0.55) 0%,
+                rgba(20, 13, 8, 0.72) 45%,
+                rgba(20, 13, 8, 0.92) 100%
+            ),
+            url("{% static 'finances/img/pexels-pavel-danilyuk-7654180.jpg' %}")
+            center / cover no-repeat fixed;
+        background-attachment: fixed;
+        color: var(--text-main);
+    }
+
+    a { text-decoration: none; }
+
+    .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 130px 30px 60px;
+    }
+
+    .page-header { margin-bottom: 28px; }
+
+    .page-header__small {
+        display: inline-block;
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        margin-bottom: 12px;
+    }
+
+    .page-header h1 {
+        font-size: clamp(26px, 3vw, 36px);
+        font-weight: 700;
+        color: var(--cream-light);
+        margin-bottom: 8px;
+        line-height: 1.15;
+    }
+
+    .page-header h1 span { color: var(--gold); }
+
+    .page-header p {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* =====================================================
+       CARTE FORMULAIRE
+    ===================================================== */
+    .panel {
+        background: linear-gradient(145deg, rgba(48, 32, 22, 0.82), rgba(25, 17, 11, 0.78));
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 28px 30px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .panel::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 12%;
+        width: 76%;
+        height: 1.5px;
+        background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), transparent);
+        border-radius: 10px;
+    }
+
+    /* =====================================================
+       FORMULAIRE
+    ===================================================== */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 22px;
+    }
+
+    .form-grid .field--full { grid-column: 1 / -1; }
+
+    @media (max-width: 640px) {
+        .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+
+    .field label {
+        color: var(--cream);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .field label .opt {
+        color: var(--text-muted);
+        font-weight: 400;
+        font-size: 12px;
+        margin-left: 4px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+        width: 100%;
+        height: 46px;
+        padding: 0 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(217, 173, 85, 0.28);
+        background: rgba(20, 13, 8, 0.55);
+        color: var(--cream-light);
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+        outline: none;
+    }
+
+    .field textarea {
+        height: auto;
+        min-height: 46px;
+        padding: 12px 14px;
+        resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+        border-color: var(--gold);
+        background: rgba(20, 13, 8, 0.75);
+        box-shadow: 0 0 0 3px rgba(217, 173, 85, 0.15);
+    }
+
+    .field select option {
+        background: #24170d;
+        color: var(--cream-light);
+    }
+
+    .field .help {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+    }
+
+    .field .errors {
+        list-style: none;
+        color: #ffb3b3;
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 4px;
+    }
+
+    /* Erreurs globales */
+    .form-errors {
+        background: rgba(191, 60, 60, 0.15);
+        border: 1px solid rgba(230, 100, 100, 0.45);
+        color: #ffd4d4;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        margin-bottom: 22px;
+    }
+
+    .form-errors ul { margin: 0; padding-left: 18px; }
+
+    /* =====================================================
+       BOUTONS
+    ===================================================== */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 26px;
+        padding-top: 22px;
+        border-top: 1px solid rgba(217, 173, 85, 0.15);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 46px;
+        padding: 0 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: transform 0.3s, box-shadow 0.3s, filter 0.3s, background 0.3s;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn--primary {
+        color: #24170d;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        box-shadow: 0 6px 20px rgba(191, 140, 55, 0.35);
+    }
+
+    .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(191, 140, 55, 0.55);
+        filter: brightness(1.06);
+    }
+
+    .btn--ghost {
+        color: var(--gold-light);
+        background: rgba(217, 173, 85, 0.08);
+        border: 1px solid rgba(217, 173, 85, 0.55);
+    }
+
+    .btn--ghost:hover {
+        background: rgba(217, 173, 85, 0.18);
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 750px) {
+        .container { padding: 90px 20px 90px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="page-header">
+        <span class="page-header__small">REVENUS</span>
+        <h1>Ajouter un <span>revenu</span></h1>
+        <p>Renseignez les informations ci-dessous. Une date future crée automatiquement un revenu prévu.</p>
+    </div>
+
+    <div class="panel">
+
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                <ul>
+                    {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <!-- Montant -->
+                <div class="field">
+                    <label for="{{ form.montant.id_for_label }}">Montant</label>
+                    {{ form.montant }}
+                    {% if form.montant.errors %}<ul class="errors">{% for e in form.montant.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+
+                <!-- Catégorie -->
+                <div class="field">
+                    <label for="{{ form.categorie.id_for_label }}">Catégorie</label>
+                    {{ form.categorie }}
+                    {% if form.categorie.errors %}<ul class="errors">{% for e in form.categorie.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+
+                <!-- Date de réception -->
+                <div class="field field--full">
+                    <label for="{{ form.date.id_for_label }}">Date de réception</label>
+                    {{ form.date }}
+                    <span class="help">Date future = revenu prévu : il n'est pas ajouté à votre solde tant que vous ne l'avez pas confirmé.</span>
+                    {% if form.date.errors %}<ul class="errors">{% for e in form.date.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="field field--full">
+                    <label for="{{ form.note.id_for_label }}">
+                        Description <span class="opt">(optionnel)</span>
+                    </label>
+                    {{ form.note }}
+                    {% if form.note.errors %}<ul class="errors">{% for e in form.note.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn--primary">Enregistrer</button>
+                <a href="{% url 'revenus' %}" class="btn btn--ghost">Annuler</a>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

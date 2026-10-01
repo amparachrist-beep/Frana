@@ -117,6 +117,76 @@
     }
 
     /* =====================================================
+       BANNIÈRE REVENUS À CONFIRMER
+    ===================================================== */
+    .confirm-banner {
+        background: linear-gradient(135deg, rgba(217, 173, 85, 0.22), rgba(48, 32, 22, 0.9));
+        border: 1px solid rgba(217, 173, 85, 0.55);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 28px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 20px 50px -20px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .confirm-banner::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--gold), var(--gold-light));
+    }
+
+    .confirm-banner__title {
+        color: var(--gold-light);
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .confirm-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0;
+        border-top: 1px solid rgba(217, 173, 85, 0.18);
+        flex-wrap: wrap;
+    }
+
+    .confirm-item:first-of-type { border-top: none; padding-top: 0; }
+
+    .confirm-item__text {
+        color: var(--cream);
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        flex: 1;
+        min-width: 240px;
+        line-height: 1.5;
+    }
+
+    .confirm-item__text strong { color: var(--gold-light); }
+
+    .confirm-item form { margin: 0; }
+
+    .btn--small {
+        height: 38px;
+        padding: 0 18px;
+        font-size: 13px;
+    }
+
+    /* =====================================================
        CARTES STATS
     ===================================================== */
     .stats {
@@ -291,6 +361,26 @@
     .panel__link:hover { color: var(--gold-light); text-decoration: underline; }
 
     /* =====================================================
+       REVENUS À VENIR
+    ===================================================== */
+    .upcoming-list { list-style: none; display: grid; gap: 10px; }
+
+    .upcoming {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: rgba(217, 173, 85, 0.06);
+        border: 1px dashed rgba(217, 173, 85, 0.35);
+    }
+
+    .upcoming__left { display: flex; flex-direction: column; gap: 2px; }
+    .upcoming__cat { color: var(--cream-light); font-weight: 600; font-size: 14px; }
+    .upcoming__date { color: var(--text-muted); font-size: 12px; font-family: Arial, sans-serif; }
+    .upcoming__amount { color: var(--gold-light); font-weight: 700; font-size: 15px; font-family: Arial, sans-serif; }
+
+    /* =====================================================
        TRANSACTIONS
     ===================================================== */
     .tx-list { list-style: none; display: grid; gap: 10px; }
@@ -452,6 +542,26 @@
             {% endfor %}
         {% endif %}
 
+        <!-- BANNIÈRE : REVENUS À CONFIRMER -->
+        {% if revenus_a_confirmer %}
+            <div class="confirm-banner">
+                <div class="confirm-banner__title">Revenus à confirmer</div>
+                {% for t in revenus_a_confirmer %}
+                    <div class="confirm-item">
+                        <div class="confirm-item__text">
+                            Votre revenu prévu de
+                            <strong>{{ t.montant|floatformat:0 }} {{ request.user.devise }}</strong>
+                            est arrivé à échéance. Pensez à le confirmer comme reçu.
+                        </div>
+                        <form method="post" action="{% url 'revenu_confirmer' t.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn--primary btn--small">Je l'ai reçu</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <!-- STATS -->
         <div class="stats">
             <div class="stat">
@@ -515,13 +625,35 @@
         <!-- FEEDBACK PRODUIT -->
         {% include "finances/_feedback_carte.html" %}
 
+        <!-- REVENUS À VENIR -->
+        {% if revenus_prevus %}
+            <div class="panel" style="margin-bottom: 32px;">
+                <div class="panel__header">
+                    <h2 class="panel__title">Revenus à venir</h2>
+                    <a href="{% url 'revenus' %}" class="panel__link">Voir tout →</a>
+                </div>
+                <ul class="upcoming-list">
+                    {% for t in revenus_prevus %}
+                        <li class="upcoming">
+                            <div class="upcoming__left">
+                                <span class="upcoming__cat">{{ t.categorie.nom }}</span>
+                                <span class="upcoming__date">{{ t.date|date:"d M Y" }}</span>
+                            </div>
+                            <span class="upcoming__amount">
+                                + {{ t.montant|floatformat:0 }} {{ request.user.devise }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
         <!-- GRILLE : TRANSACTIONS + OBJECTIFS -->
         <div class="grid-2">
 
             <div class="panel">
                 <div class="panel__header">
                     <h2 class="panel__title">Dernières transactions</h2>
-                    <a href="{% url 'transactions' %}" class="panel__link">Voir tout →</a>
                 </div>
 
                 {% if transactions %}
@@ -542,7 +674,8 @@
                 {% else %}
                     <p class="tx-empty">Aucune transaction enregistrée pour le moment.</p>
                     <div class="cta-row">
-                        <a href="{% url 'transaction_create' %}" class="btn btn--primary">+ Nouvelle transaction</a>
+                        <a href="{% url 'revenu_create' %}" class="btn btn--primary">+ Ajouter un revenu</a>
+                        <a href="{% url 'depense_create' %}" class="btn btn--ghost">+ Ajouter une dépense</a>
                     </div>
                 {% endif %}
             </div>
@@ -579,8 +712,8 @@
 
         <!-- CTA RAPIDE -->
         <div class="cta-row">
-            <a href="{% url 'transaction_create' %}" class="btn btn--primary">+ Nouvelle transaction</a>
-            <a href="{% url 'source_create' %}" class="btn btn--ghost">+ Source de revenu</a>
+            <a href="{% url 'revenu_create' %}" class="btn btn--primary">+ Ajouter un revenu</a>
+            <a href="{% url 'depense_create' %}" class="btn btn--ghost">+ Ajouter une dépense</a>
             <a href="{% url 'objectif_create' %}" class="btn btn--ghost">+ Objectif</a>
             <a href="{% url 'dette_create' %}" class="btn btn--ghost">+ Dette</a>
         </div>

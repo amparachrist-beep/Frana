@@ -73,12 +73,14 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
         return self.nom_complet
 
     # ---------- Solde calculé à la volée (décision actée §6) ----------
+    # Seules les transactions reçues comptent (les revenus prévus sont exclus)
     @property
     def solde(self):
-        revenus = self.transactions.filter(type=Transaction.Type.REVENU).aggregate(
+        base = self.transactions.filter(statut=Transaction.Statut.RECUE)
+        revenus = base.filter(type=Transaction.Type.REVENU).aggregate(
             total=Sum("montant")
         )["total"] or Decimal("0")
-        depenses = self.transactions.filter(type=Transaction.Type.DEPENSE).aggregate(
+        depenses = base.filter(type=Transaction.Type.DEPENSE).aggregate(
             total=Sum("montant")
         )["total"] or Decimal("0")
         return revenus - depenses
@@ -176,6 +178,10 @@ class Transaction(models.Model):
         BANQUE = "banque", "Banque"
         AUTRE = "autre", "Autre"
 
+    class Statut(models.TextChoices):
+        RECUE = "recue", "Reçue"
+        PREVUE = "prevue", "Prévue"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     utilisateur = models.ForeignKey(
         Utilisateur, on_delete=models.CASCADE, related_name="transactions"
@@ -196,6 +202,10 @@ class Transaction(models.Model):
         related_name="transactions",
         blank=True,
         null=True,
+    )
+    # Revenu prévu (date future) ou reçu ; les dépenses sont toujours "reçues"
+    statut = models.CharField(
+        max_length=10, choices=Statut.choices, default=Statut.RECUE
     )
     cree_le = models.DateTimeField(auto_now_add=True)
 
@@ -225,13 +235,20 @@ class Transaction(models.Model):
             raise ValidationError(
                 "La source de revenu doit appartenir au même utilisateur."
             )
+        # Une dépense ne peut pas être "prévue"
+        if self.type == self.Type.DEPENSE and self.statut == self.Statut.PREVUE:
+            raise ValidationError("Une dépense ne peut pas être prévue.")
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 
         # Mise à jour du dernier versement reçu sur la source liée
-        if self.source_revenu_id and self.type == self.Type.REVENU:
+        if (
+            self.source_revenu_id
+            and self.type == self.Type.REVENU
+            and self.statut == self.Statut.RECUE
+        ):
             SourceRevenu.objects.filter(pk=self.source_revenu_id).update(
                 dernier_montant_recu=self.montant,
                 dernier_date_recue=self.date,

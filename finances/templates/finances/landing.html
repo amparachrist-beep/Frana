@@ -626,6 +626,15 @@ body {
 }
 
 
+/* Mot mis en avant dans la description */
+.hero p strong {
+
+    color: #f0ce82;
+
+    font-weight: 700;
+}
+
+
 /* =========================
    BOUTONS
 ========================= */
@@ -923,6 +932,10 @@ body {
     border: none;
     cursor: pointer;
     font-family: Arial, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
 
 .mobile-menu-discover {
@@ -1123,7 +1136,7 @@ body {
 
         <div class="mobile-menu-actions">
             <a href="{% url 'connexion' %}" class="navbar__login">Se connecter</a>
-            <button type="button" class="btn-primary mobile-menu-discover" id="franaDiscoverBtn">Découvrir FRANA</button>
+            <a href="{% url 'fonctionnalites' %}" class="btn-primary mobile-menu-discover">Découvrir FRANA</a>
         </div>
     </div>
 
@@ -1146,9 +1159,7 @@ body {
             </h1>
 
             <p>
-                FRANA vous aide à suivre vos revenus et vos dépenses,
-                comprendre votre solde disponible et mieux préparer
-                votre prochaine rentrée d'argent.
+               FRANA vous aide à suivre vos revenus et vos dépenses, comprendre votre solde disponible et mieux préparer votre prochaine rentrée d'argent.
             </p>
 
             <div class="hero-buttons">
@@ -1157,7 +1168,7 @@ body {
                     Commencer maintenant
                 </a>
 
-                <a href="#fonctionnalites" class="btn-secondary">
+                <a href="{% url 'fonctionnalites' %}" class="btn-secondary">
                     Découvrir FRANA
                 </a>
 

@@ -600,6 +600,12 @@
             font-family: Arial, sans-serif;
         }
 
+        /* Mise en avant des mots-clés Revenus / Dépenses dans les cartes */
+        .feature__desc strong {
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+
         /* =====================================================
            AFRIQUE / SAAS SPÉCIAL
         ===================================================== */
@@ -1096,7 +1102,7 @@
                     </p>
                     <p>
                         Pas de connexion bancaire, pas de dépendance à un système financier
-                        complexe : <strong>l'utilisateur déclare lui-même ses transactions</strong>
+                        complexe : <strong>l'utilisateur déclare lui-même ses revenus et ses dépenses</strong>
                         et Frana fait le reste.
                     </p>
                 </div>
@@ -1221,10 +1227,11 @@
                             <path d="M7 14l4-4 4 4 5-5"/>
                         </svg>
                     </div>
-                    <div class="feature__title">Suivi quotidien</div>
+                    <div class="feature__title">Revenus &amp; dépenses</div>
                     <div class="feature__desc">
-                        Enregistrement manuel des transactions (montant, catégorie, date,
-                        canal déclaratif) avec un solde disponible calculé en temps réel.
+                        Dans <strong>Revenus</strong>, j'enregistre ce que je gagne ou ce que je vais recevoir.
+                        Dans <strong>Dépenses</strong>, j'enregistre ce que je dépense.
+                        Le solde disponible est calculé en temps réel.
                     </div>
                 </div>
 
@@ -1405,8 +1412,7 @@
 
     </div>
 
-    <!-- APPARITION AU SCROLL -->
-       <!-- APPARITION AU SCROLL (en cascade) -->
+    <!-- APPARITION AU SCROLL (en cascade) -->
     <script>
         (function () {
             var els = document.querySelectorAll('.reveal');
